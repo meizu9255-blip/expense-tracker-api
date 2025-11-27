@@ -3,68 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Төлемдер мен Шығындарды Бақылау</title>
+    <title>Qarjy Baqylau Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- ДИЗАЙН (Figma Style) --- */
+        /* --- 1. ҚОЗҒАЛАТЫН ФОН (Magic Background) --- */
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            background: linear-gradient(-45deg, #0f172a, #1e3a8a, #312e81, #000000);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             color: #ffffff;
             font-family: 'Segoe UI', sans-serif;
             min-height: 100vh;
-            overflow-x: hidden;
         }
-        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .form-auth { background: #1e293b; border: 1px solid #334155; border-radius: 20px; padding: 40px; width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- 2. АНИМАЦИЯЛАР --- */
+        @keyframes floatUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-up { animation: floatUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
+        
+        /* Кешігіп шығу (Stagger effect) */
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        /* --- 3. СТИЛЬДЕР --- */
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .form-auth { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 40px; width: 400px; box-shadow: 0 0 50px rgba(59, 130, 246, 0.2); text-align: center; }
+
         .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; margin-bottom: 20px; }
-        .logo-circle { width: 45px; height: 45px; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); }
-        .form-panel { background: #111827; border: 1px solid #1f2937; border-radius: 24px; padding: 30px; height: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
-        .type-toggle { display: flex; background: #1f2937; padding: 5px; border-radius: 12px; margin-bottom: 20px; }
-        .toggle-btn { flex: 1; padding: 10px; border: none; background: transparent; color: #9ca3af; font-weight: bold; border-radius: 10px; transition: all 0.3s; }
-        .toggle-btn.active-expense { background: #ef4444; color: white; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4); }
-        .toggle-btn.active-income { background: #10b981; color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4); }
-        .form-control, .form-select { background-color: #1f2937 !important; border: 1px solid #374151; color: white !important; border-radius: 10px; padding: 12px; margin-bottom: 15px; }
-        .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); }
-        .btn-add { background: #2563eb; color: white; border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; transition: 0.3s; }
-        .btn-add:hover { background: #1d4ed8; }
-        .nav-container { display: flex; justify-content: center; margin-bottom: 20px; }
-        .nav-toggle { background: #111827; border: 1px solid #1f2937; border-radius: 50px; padding: 5px; display: flex; width: 100%; max-width: 500px; }
+        .logo-circle { width: 50px; height: 50px; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: white; box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); animation: floatUp 1s ease-out; }
+
+        /* Панельдер - Glassmorphism */
+        .form-panel, .custom-panel {
+            background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px;
+            padding: 30px; height: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.4s ease;
+        }
+        .form-panel:hover, .custom-panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Карточкалар */
+        .stat-card {
+            border-radius: 20px; padding: 20px; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: center; height: 100%;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        .stat-card:hover { transform: scale(1.05); z-index: 10; }
+        
+        .card-green { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 78, 59, 0.9)); border: 1px solid #059669; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2); }
+        .card-green:hover { box-shadow: 0 0 25px rgba(16, 185, 129, 0.6); }
+        
+        .card-red { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(127, 29, 29, 0.9)); border: 1px solid #dc2626; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); }
+        .card-red:hover { box-shadow: 0 0 25px rgba(239, 68, 68, 0.6); }
+
+        .card-blue { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(30, 58, 138, 0.9)); border: 1px solid #2563eb; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2); }
+        .card-blue:hover { box-shadow: 0 0 25px rgba(59, 130, 246, 0.6); }
+
+        /* Элементтер */
+        .form-control, .form-select {
+            background-color: rgba(15, 23, 42, 0.8) !important; border: 1px solid #374151;
+            color: white !important; border-radius: 12px; padding: 12px; transition: all 0.3s;
+        }
+        .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); transform: scale(1.02); }
+        
+        .btn-add {
+            background: linear-gradient(90deg, #2563eb, #3b82f6); color: white; border: none; width: 100%; padding: 12px;
+            border-radius: 12px; font-weight: bold; transition: all 0.3s; position: relative; overflow: hidden;
+        }
+        .btn-add:hover { letter-spacing: 1px; box-shadow: 0 0 20px rgba(37, 99, 235, 0.6); }
+        
+        .type-toggle { display: flex; background: #0f172a; padding: 6px; border-radius: 14px; margin-bottom: 20px; border: 1px solid #334155; }
+        .toggle-btn { flex: 1; padding: 10px; border: none; background: transparent; color: #9ca3af; font-weight: bold; border-radius: 10px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        .toggle-btn.active-expense { background: #ef4444; color: white; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.5); transform: scale(1.05); }
+        .toggle-btn.active-income { background: #10b981; color: white; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.5); transform: scale(1.05); }
+
+        /* Тізім анимациясы */
+        .tx-item {
+            background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px; padding: 15px 20px; margin-bottom: 10px;
+            display: flex; align-items: center; justify-content: space-between;
+            transition: all 0.3s; opacity: 0; animation: floatUp 0.5s ease-out forwards;
+        }
+        .tx-item:hover { background: rgba(30, 41, 59, 0.9); transform: translateX(5px); border-color: #3b82f6; }
+        
+        .nav-toggle { background: #0f172a; border: 1px solid #334155; border-radius: 50px; padding: 5px; display: flex; width: 100%; max-width: 400px; }
         .tab-btn { flex: 1; border: none; background: transparent; color: #9ca3af; padding: 10px; border-radius: 40px; font-weight: 600; transition: 0.3s; }
-        .tab-btn.active { background: #2563eb; color: white; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); }
-        .stat-card { border-radius: 16px; padding: 20px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; height: 100%; }
-        .card-green { background: linear-gradient(135deg, rgba(6, 78, 59, 0.8), rgba(16, 185, 129, 0.1)); border-left: 4px solid #10b981; }
-        .card-red { background: linear-gradient(135deg, rgba(127, 29, 29, 0.8), rgba(239, 68, 68, 0.1)); border-left: 4px solid #ef4444; }
-        .card-blue { background: linear-gradient(135deg, rgba(30, 58, 138, 0.8), rgba(59, 130, 246, 0.1)); border-left: 4px solid #3b82f6; }
-        .chart-box { background: #111827; border: 1px solid #1f2937; border-radius: 20px; padding: 20px; margin-bottom: 20px; }
-        .tx-item { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 15px 20px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; transition: transform 0.2s; }
-        .tx-item:hover { background: rgba(30, 41, 59, 0.8); transform: translateY(-2px); }
-        .tx-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-size: 1.2rem; }
-        .icon-exp { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-        .icon-inc { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-        .tx-cat { background: #1e293b; color: #93c5fd; padding: 4px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; margin-right: 10px; }
-        .tx-date { color: #94a3b8; font-size: 0.9rem; }
-        .tx-amt { font-weight: bold; font-size: 1.1rem; margin-right: 15px; }
-        .text-red { color: #ef4444; } .text-green { color: #10b981; }
-        .btn-del { background: transparent; border: none; color: #64748b; }
-        .btn-del:hover { color: #ef4444; }
+        .tab-btn.active { background: #3b82f6; color: white; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
     </style>
 </head>
 <body>
 
     <div id="auth-screen" class="login-overlay">
-        <div class="form-auth">
+        <div class="form-auth animate-up">
             <div class="logo-circle mx-auto mb-4">$</div>
-            <h3 class="fw-bold mb-4" id="auth-title">Жүйеге кіру</h3>
+            <h3 class="fw-bold mb-4">Жүйеге кіру</h3>
             <div id="register-fields" style="display: none;">
-                <input type="text" id="reg-username" class="form-control" placeholder="Атыңыз (Username)">
+                <input type="text" id="reg-username" class="form-control mb-3" placeholder="Атыңыз">
             </div>
-            <input type="email" id="auth-email" class="form-control" placeholder="admin@test.kz" value="admin@test.kz">
-            <input type="password" id="auth-password" class="form-control" placeholder="••••••" value="123">
+            <input type="email" id="auth-email" class="form-control mb-3" placeholder="admin@test.kz" value="admin@test.kz">
+            <input type="password" id="auth-password" class="form-control mb-4" placeholder="••••••" value="123">
             <button onclick="handleAuth()" class="btn-add mb-3" id="auth-btn">Кіру</button>
-            <p class="text-secondary small" style="cursor: pointer;" onclick="toggleAuthMode()">
+            <p class="text-secondary small" style="cursor: pointer; transition: 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#6c757d'" onclick="toggleAuthMode()">
                 <span id="auth-switch-text">Аккаунтыңыз жоқ па? Тіркелу</span>
             </p>
             <p id="error-msg" class="text-danger mt-2 small" style="display:none;"></p>
@@ -72,12 +128,12 @@
     </div>
 
     <div id="app-screen" class="container-fluid px-4" style="display: none; max-width: 1400px;">
-        <div class="header-bar">
+        <div class="header-bar animate-up">
             <div class="d-flex align-items-center gap-3">
                 <div class="logo-circle"><i class="fas fa-wallet"></i></div>
                 <div>
                     <h4 class="fw-bold m-0">Төлемдер мен Шығындарды Бақылау</h4>
-                    <small class="text-secondary">Кірістер мен шығындарды бір жерде бақылаңыз</small>
+                    <small class="text-secondary-subtle">Кірістер мен шығындарды бір жерде бақылаңыз</small>
                 </div>
             </div>
             <div class="d-flex align-items-center gap-3">
@@ -85,7 +141,7 @@
                     <div class="fw-bold" id="user-name">User</div>
                     <div class="small text-secondary" id="user-email">email@...</div>
                 </div>
-                <button onclick="logout()" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                <button onclick="logout()" class="btn btn-outline-danger btn-sm rounded-pill px-3" style="border: 1px solid #ef4444; color: #ef4444;">
                     <i class="fas fa-sign-out-alt me-2"></i> Шығу
                 </button>
             </div>
@@ -93,73 +149,67 @@
 
         <div class="row g-4">
             <div class="col-lg-4">
-                <div class="form-panel">
+                <div class="form-panel animate-up delay-1">
                     <h5 class="mb-4 text-white">Транзакция қосу</h5>
                     <div class="type-toggle">
                         <button id="btn-expense" class="toggle-btn active-expense" onclick="setType('expense')"><i class="fas fa-arrow-circle-down me-2"></i> Шығын</button>
                         <button id="btn-income" class="toggle-btn" onclick="setType('income')"><i class="fas fa-arrow-circle-up me-2"></i> Төлем</button>
                     </div>
-                    <label class="small text-secondary mb-1">Сома (₸)</label>
-                    <input type="number" id="amount" class="form-control mb-3" placeholder="0">
+                    <input type="number" id="amount" class="form-control mb-3" placeholder="Сома (₸)">
                     <div id="cat-wrapper">
-                        <label class="small text-secondary mb-1">Санат</label>
                         <select id="cat-id" class="form-select mb-3">
-                            <option value="1">🍔 Тамақ</option> <option value="2">🚌 Көлік</option> <option value="3">🛍️ Сатып алу</option>
-                            <option value="4">🎮 Ойын-сауық</option> <option value="5">💡 Коммуналдық</option> <option value="6">💊 Денсаулық</option>
-                            <option value="7">🎓 Білім</option> <option value="8">✈️ Саяхат</option> <option value="9">📦 Басқа</option>
+                            <option value="1">🍔 Тамақ</option><option value="2">🚌 Көлік</option><option value="3">🛍️ Сатып алу</option>
+                            <option value="4">🎮 Ойын-сауық</option><option value="5">💡 Коммуналдық</option><option value="6">💊 Денсаулық</option>
+                            <option value="7">🎓 Білім</option><option value="8">✈️ Саяхат</option><option value="9">📦 Басқа</option>
                         </select>
                     </div>
-                    <label class="small text-secondary mb-1">Күні</label>
                     <input type="date" id="date" class="form-control mb-3">
-                    <label class="small text-secondary mb-1">Сипаттама</label>
                     <textarea id="desc" class="form-control mb-4" rows="3" placeholder="Сипаттама..."></textarea>
                     <button onclick="addTransaction()" class="btn-add">Қосу</button>
                 </div>
             </div>
 
             <div class="col-lg-8">
-                <div class="nav-container">
+                <div class="nav-container animate-up delay-2">
                     <div class="nav-toggle">
                         <button class="tab-btn active" onclick="switchTab('dashboard')" id="tab-dashboard">Шолу</button>
                         <button class="tab-btn" onclick="switchTab('transactions')" id="tab-transactions">Транзакциялар</button>
                     </div>
                 </div>
 
-                <div id="view-dashboard">
+                <div id="view-dashboard" class="animate-up delay-3">
                     <div class="row g-3 mb-4">
-                        <div class="col-md-4"><div class="stat-card card-green"><small class="text-secondary">Жалпы төлемдер</small><h3 id="total-income" class="mb-0">0 ₸</h3></div></div>
-                        <div class="col-md-4"><div class="stat-card card-red"><small class="text-secondary">Жалпы шығындар</small><h3 id="total-expenses" class="mb-0">0 ₸</h3></div></div>
-                        <div class="col-md-4"><div class="stat-card card-blue"><small class="text-secondary">Баланс</small><h3 id="net-balance" class="mb-0">0 ₸</h3></div></div>
+                        <div class="col-md-4"><div class="stat-card card-green"><small>Төлемдер</small><h3 id="total-income" class="mb-0">0 ₸</h3></div></div>
+                        <div class="col-md-4"><div class="stat-card card-red"><small>Шығындар</small><h3 id="total-expenses" class="mb-0">0 ₸</h3></div></div>
+                        <div class="col-md-4"><div class="stat-card card-blue"><small>Баланс</small><h3 id="net-balance" class="mb-0">0 ₸</h3></div></div>
                     </div>
-                    <div class="chart-box">
-                        <h5 class="mb-4">Соңғы 7 күннің белсенділігі</h5>
+                    <div class="custom-panel p-4 mb-4">
+                        <h5 class="mb-3">Соңғы 7 күннің белсенділігі</h5>
                         <div style="height: 250px;"><canvas id="barChart"></canvas></div>
                     </div>
-                    <div class="chart-box">
+                    <div class="custom-panel p-4">
                         <h5 class="mb-3">Санаттар бойынша шығындар</h5>
                         <div style="height: 250px; display: flex; justify-content: center;"><canvas id="doughnutChart"></canvas></div>
                     </div>
                 </div>
 
-                <div id="view-transactions" style="display: none;">
+                <div id="view-transactions" style="display: none;" class="animate-up delay-3">
                     <div class="row mb-3">
-                        <div class="col-md-8"><input type="text" id="search-input" class="form-control" placeholder="Транзакцияларды іздеу..." oninput="filterData()"></div>
+                        <div class="col-md-8"><input type="text" id="search-input" class="form-control" placeholder="Іздеу..." oninput="filterData()"></div>
                         <div class="col-md-4">
                             <select id="filter-type" class="form-select" onchange="filterData()">
-                                <option value="all">Барлық түрлер</option><option value="income">Төлемдер</option><option value="expense">Шығындар</option>
+                                <option value="all">Барлығы</option><option value="income">Төлемдер</option><option value="expense">Шығындар</option>
                             </select>
                         </div>
                     </div>
-                    <div id="transaction-list">
-                        <div class="text-center text-muted py-5">Жүктелуде...</div>
-                    </div>
+                    <div id="transaction-list"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const API_URL = "https://expense-tracker-api-iy65.onrender.com";
+        const API_URL = "https://expense-tracker-api-iy65.onrender.com"; // СІЗДІҢ RENDER СІЛТЕМЕҢІЗ (немесе http://127.0.0.1:8000)
         let token = localStorage.getItem("access_token");
         let currentType = 'expense';
         let isLoginMode = true;
@@ -200,6 +250,9 @@
         async function handleAuth() {
             const email = document.getElementById("auth-email").value;
             const password = document.getElementById("auth-password").value;
+            const btn = document.getElementById("auth-btn");
+            btn.innerText = "Күте тұрыңыз...";
+            
             if (isLoginMode) {
                 const fd = new FormData(); fd.append("username", email); fd.append("password", password);
                 try {
@@ -209,18 +262,30 @@
                     localStorage.setItem("access_token", data.access_token);
                     token = data.access_token;
                     showApp();
-                } catch { document.getElementById("error-msg").innerText = "Қате деректер!"; document.getElementById("error-msg").style.display = "block"; }
+                } catch { 
+                    document.getElementById("error-msg").innerText = "Қате деректер! (Render оянуы мүмкін)"; 
+                    document.getElementById("error-msg").style.display = "block"; 
+                    btn.innerText = "Кіру";
+                }
             } else {
                 const username = document.getElementById("reg-username").value;
                 try {
                     const res = await fetch(`${API_URL}/users/`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, email, password }) });
                     if (res.ok) { alert("Сәтті тіркелдіңіз!"); toggleAuthMode(); } else { alert("Тіркелу қатесі!"); }
-                } catch (e) { console.error(e); }
+                    btn.innerText = "Тіркелу";
+                } catch (e) { console.error(e); btn.innerText = "Тіркелу"; }
             }
         }
 
         function logout() { localStorage.removeItem("access_token"); location.reload(); }
-        function showApp() { document.getElementById("auth-screen").style.display = "none"; document.getElementById("app-screen").style.display = "block"; loadData(); loadUserProfile(); }
+        function showApp() { 
+            document.getElementById("auth-screen").style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById("auth-screen").style.display = "none"; 
+                document.getElementById("app-screen").style.display = "block"; 
+                loadData(); loadUserProfile(); 
+            }, 500);
+        }
 
         async function loadUserProfile() {
             try { const res = await fetch(`${API_URL}/users/me/`, { headers: { "Authorization": `Bearer ${token}` } }); const user = await res.json(); document.getElementById("user-name").innerText = user.username; document.getElementById("user-email").innerText = user.email; } catch(e){}
@@ -229,16 +294,15 @@
         async function loadData() {
             const resBal = await fetch(`${API_URL}/balance/`, { headers: { "Authorization": `Bearer ${token}` } });
             const bal = await resBal.json();
-            document.getElementById("total-income").innerText = bal.total_income.toLocaleString() + " ₸";
-            document.getElementById("total-expenses").innerText = bal.total_expenses.toLocaleString() + " ₸";
-            document.getElementById("net-balance").innerText = bal.net_balance.toLocaleString() + " ₸";
+            animateValue("total-income", 0, bal.total_income, 1000);
+            animateValue("total-expenses", 0, bal.total_expenses, 1000);
+            animateValue("net-balance", 0, bal.net_balance, 1000);
 
             const [resExp, resInc] = await Promise.all([
                 fetch(`${API_URL}/expenses/`, { headers: { "Authorization": `Bearer ${token}` } }),
                 fetch(`${API_URL}/incomes/`, { headers: { "Authorization": `Bearer ${token}` } })
             ]);
             
-            // ТҮЗЕТУ: income мен expense-ті дұрыс біріктіру
             const exp = resExp.ok ? await resExp.json() : [];
             const inc = resInc.ok ? await resInc.json() : [];
 
@@ -253,6 +317,26 @@
             const stats = resStat.ok ? await resStat.json() : [];
             drawDoughnut(stats);
             drawBarChartFromData(allTransactions);
+        }
+        
+        function animateValue(id, start, end, duration) {
+            let obj = document.getElementById(id);
+            let range = end - start;
+            let minTimer = 50;
+            let stepTime = Math.abs(Math.floor(duration / range));
+            stepTime = Math.max(stepTime, minTimer);
+            let startTime = new Date().getTime();
+            let endTime = startTime + duration;
+            let timer;
+            function run() {
+                let now = new Date().getTime();
+                let remaining = Math.max((endTime - now) / duration, 0);
+                let value = Math.round(end - (remaining * range));
+                obj.innerHTML = value.toLocaleString() + " ₸";
+                if (value == end) clearInterval(timer);
+            }
+            timer = setInterval(run, stepTime);
+            run();
         }
 
         async function addTransaction() {
@@ -270,7 +354,6 @@
             });
 
             if(res.ok) {
-                alert("Сәтті қосылды!");
                 document.getElementById("amount").value = "";
                 document.getElementById("desc").value = "";
                 loadData();
@@ -297,18 +380,20 @@
             list.innerHTML = "";
             if(data.length === 0) { list.innerHTML = '<div class="text-center text-muted py-5">Деректер жоқ</div>'; return; }
 
-            data.forEach(item => {
+            data.forEach((item, index) => {
                 const isExp = item.type === 'expense';
-                const dateStr = new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const dateStr = new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 const catName = isExp ? (catNames[item.category_id] || "Басқа") : (item.description || "Төлем");
+                const delay = index * 0.1;
+                
                 const html = `
-                    <div class="tx-item">
+                    <div class="tx-item" style="animation-delay: ${delay}s">
                         <div class="d-flex align-items-center">
                             <div class="tx-icon ${isExp ? 'icon-exp' : 'icon-inc'}"><i class="fas ${isExp ? 'fa-arrow-down' : 'fa-arrow-up'}"></i></div>
                             <div><span class="tx-cat">${catName}</span><span class="tx-date ms-2">${dateStr}</span></div>
                         </div>
                         <div class="d-flex align-items-center">
-                            <span class="tx-amt ${isExp ? 'text-red' : 'text-green'}">${isExp ? '-' : '+'} ${item.amount.toLocaleString()} KZT</span>
+                            <span class="tx-amt ${isExp ? 'text-red' : 'text-green'}">${isExp ? '-' : '+'} ${item.amount.toLocaleString()} ₸</span>
                             <button class="btn-del ms-3" onclick="deleteItem(${item.id}, '${item.type}')"><i class="fas fa-trash-alt"></i></button>
                         </div>
                     </div>`;
@@ -318,8 +403,9 @@
 
         async function deleteItem(id, type) {
             if(!confirm("Өшіруге сенімдісіз бе?")) return;
-            if(type === 'income') { alert("Төлемді өшіру мүмкін емес"); return; }
-            await fetch(`${API_URL}/expenses/${id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
+            const endpoint = type === 'expense' ? `/expenses/${id}` : null;
+            if(!endpoint) { alert("Төлемді өшіру мүмкін емес"); return; }
+            await fetch(`${API_URL}${endpoint}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
             loadData();
         }
 
@@ -336,7 +422,6 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: 'white' } } } }
             });
         }
-
         function drawBarChartFromData(data) {
             const ctx = document.getElementById('barChart');
             if (barInstance) barInstance.destroy();
