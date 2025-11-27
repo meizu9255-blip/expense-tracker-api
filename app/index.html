@@ -3,221 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qarjy Baqylau Pro - Animated</title>
+    <title>Qarjy Pro - Final Fixed</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- 1. СИҚЫРЛЫ ФОН (Live Gradient) --- */
+        /* --- 1. АНИМАЦИЯ (Smooth) --- */
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .animate-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        .delay-1 { animation-delay: 0.1s; } .delay-2 { animation-delay: 0.2s; } .delay-3 { animation-delay: 0.3s; }
+
+        /* --- 2. НЕГІЗГІ ДИЗАЙН (Dark Blue) --- */
         body {
-            background: linear-gradient(-45deg, #0f172a, #1e3a8a, #312e81, #020617);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
             color: #ffffff;
             font-family: 'Segoe UI', sans-serif;
             min-height: 100vh;
             overflow-x: hidden;
         }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
 
-        /* --- 2. КІРУ АНИМАЦИЯЛАРЫ (Staggered Fade Up) --- */
-        @keyframes floatUp {
-            from { transform: translateY(40px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        /* Негізгі класс */
-        .animate-up { 
-            animation: floatUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; 
-            opacity: 0; /* Басында көрінбей тұрады */
+        /* --- 3. HEADER (Түзелген) --- */
+        .header-bar {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 15px 30px;
+            margin-bottom: 30px;
+            margin-top: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            
+            /* ОҢ ЖАҚҚА ЖЫЛЖЫТУ ҮШІН: */
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
         }
         
-        /* Кезекпен шығу (Кідіріс) */
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
-        .delay-4 { animation-delay: 0.4s; }
-        .delay-5 { animation-delay: 0.5s; }
+        .logo-circle {
+            width: 45px; height: 45px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; color: white;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+        }
 
-        /* --- 3. ШЫНЫ ЭФФЕКТ (Glassmorphism Panels) --- */
-        .form-panel, .custom-panel, .nav-header {
-            background: rgba(30, 41, 59, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        /* ПРОФИЛЬ БЛОГЫ (Оң жақта) */
+        .profile-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 5px 15px 5px 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-icon {
+            width: 32px; height: 32px;
+            background: #3b82f6;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        /* --- 4. ПАНЕЛЬДЕР --- */
+        .form-panel, .custom-panel, .form-auth {
+            background: #111827;
+            border: 1px solid #1f2937;
             border-radius: 24px;
             padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
         }
-        .form-panel:hover, .custom-panel:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
+        .form-panel:hover, .custom-panel:hover { transform: translateY(-3px); border-color: #374151; }
 
-        /* --- 4. КАРТОЧКАЛАР (Stats) --- */
-        .stat-card {
-            border-radius: 20px; padding: 25px; position: relative; overflow: hidden;
-            display: flex; flex-direction: column; justify-content: center; height: 100%;
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: none;
-            cursor: default;
-        }
-        .stat-card:hover { transform: scale(1.03); z-index: 10; }
-        
-        .card-green { 
-            background: linear-gradient(135deg, rgba(6, 78, 59, 0.8), rgba(16, 185, 129, 0.15)); 
-            border-left: 5px solid #10b981; 
-        }
-        .card-green:hover { box-shadow: 0 0 25px rgba(16, 185, 129, 0.4); }
-        
-        .card-red { 
-            background: linear-gradient(135deg, rgba(127, 29, 29, 0.8), rgba(239, 68, 68, 0.15)); 
-            border-left: 5px solid #ef4444; 
-        }
-        .card-red:hover { box-shadow: 0 0 25px rgba(239, 68, 68, 0.4); }
-
-        .card-blue { 
-            background: linear-gradient(135deg, rgba(30, 58, 138, 0.8), rgba(59, 130, 246, 0.15)); 
-            border-left: 5px solid #3b82f6; 
-        }
-        .card-blue:hover { box-shadow: 0 0 25px rgba(59, 130, 246, 0.4); }
-
-        /* --- 5. INPUT & BUTTONS --- */
+        /* --- 5. INPUTS --- */
         .form-control, .form-select {
-            background-color: rgba(15, 23, 42, 0.6) !important; 
-            border: 1px solid #475569;
-            color: #ffffff !important; 
-            border-radius: 14px; padding: 14px; 
-            transition: all 0.3s;
+            background-color: #1f2937 !important;
+            border: 1px solid #374151;
+            color: white !important;
+            border-radius: 12px; padding: 12px;
         }
-        .form-control:focus, .form-select:focus { 
-            border-color: #3b82f6; 
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); 
-            transform: scale(1.01); 
+        .form-control:focus, .form-select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+
+        /* --- 6. КАРТОЧКАЛАР --- */
+        .stat-card {
+            background: #1e293b;
+            border-radius: 20px; padding: 20px; 
+            height: 100%; border: 1px solid #334155;
+            transition: transform 0.3s; position: relative;
         }
-        
+        .stat-card:hover { transform: scale(1.03); background: #334155; }
+        .card-green { border-bottom: 4px solid #10b981; }
+        .card-red { border-bottom: 4px solid #ef4444; }
+        .card-blue { border-bottom: 4px solid #3b82f6; }
+
+        /* --- 7. БАТЫРМАЛАР --- */
         .btn-add {
-            background: linear-gradient(90deg, #2563eb, #3b82f6); 
-            color: white; border: none; width: 100%; padding: 14px;
-            border-radius: 14px; font-weight: bold; 
-            transition: all 0.3s; position: relative; overflow: hidden;
-            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+            color: white; width: 100%; padding: 12px;
+            border-radius: 12px; font-weight: bold; border: none; transition: 0.3s;
         }
-        .btn-add:hover { 
-            box-shadow: 0 0 25px rgba(37, 99, 235, 0.6); 
-            transform: translateY(-2px);
-        }
-
-        /* Toggle Buttons */
-        .type-toggle { 
-            display: flex; background: rgba(15, 23, 42, 0.5); 
-            padding: 6px; border-radius: 16px; margin-bottom: 20px; 
-            border: 1px solid #334155; 
-        }
-        .toggle-btn { 
-            flex: 1; padding: 12px; border: none; background: transparent; 
-            color: #94a3b8; font-weight: 600; border-radius: 12px; 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-        }
-        .toggle-btn.active-expense { 
-            background: #ef4444; color: white; 
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.5); 
-            transform: scale(1.02); 
-        }
-        .toggle-btn.active-income { 
-            background: #10b981; color: white; 
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.5); 
-            transform: scale(1.02); 
-        }
-
-        /* --- 6. ТРАНЗАКЦИЯЛАР ТІЗІМІ (List) --- */
-        .tx-item {
-            background: rgba(30, 41, 59, 0.4); 
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px; padding: 16px 20px; margin-bottom: 12px;
-            display: flex; align-items: center; justify-content: space-between;
-            transition: all 0.3s ease;
-            animation: floatUp 0.5s ease-out forwards;
-            opacity: 0; /* Анимацияға дейін жасырын */
-        }
-        .tx-item:hover { 
-            background: rgba(30, 41, 59, 0.9); 
-            transform: translateX(8px); 
-            border-color: rgba(59, 130, 246, 0.5); 
-        }
-        .tx-icon-circle {
-            width: 45px; height: 45px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin-right: 15px; font-size: 1.3rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-        .tx-expense { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-        .tx-income { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .btn-add:hover { box-shadow: 0 0 20px rgba(37, 99, 235, 0.5); }
         
-        .tx-tag { 
-            background: #334155; color: #e2e8f0; padding: 5px 12px; 
-            border-radius: 8px; font-size: 0.85rem; font-weight: 600; margin-right: 10px; 
-        }
-        .tx-date { color: #9ca3af; font-size: 0.9rem; font-style: italic; }
-        .tx-amt { font-weight: 800; font-size: 1.2rem; margin-right: 15px; }
-        .text-red { color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
-        .text-green { color: #10b981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.3); }
+        .type-toggle { display: flex; background: #1f2937; padding: 4px; border-radius: 12px; margin-bottom: 20px; }
+        .toggle-btn { flex: 1; padding: 10px; border: none; background: transparent; color: #9ca3af; font-weight: 600; border-radius: 10px; transition: 0.3s; }
+        .toggle-btn.active-expense { background: #ef4444; color: white; }
+        .toggle-btn.active-income { background: #10b981; color: white; }
 
-        /* Nav Toggle */
-        .nav-container { display: flex; justify-content: center; margin-bottom: 30px; }
-        .nav-toggle { 
-            background: rgba(15, 23, 42, 0.8); border: 1px solid #334155; 
-            border-radius: 50px; padding: 6px; display: flex; width: 100%; max-width: 450px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-        .tab-btn { 
-            flex: 1; border: none; background: transparent; color: #9ca3af; 
-            padding: 12px; border-radius: 40px; font-weight: 600; transition: 0.4s; 
-        }
-        .tab-btn.active { 
-            background: #3b82f6; color: white; 
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); 
-        }
-
-        /* Login Overlay */
-        .login-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(2, 6, 23, 0.95); z-index: 9999; 
-            display: flex; align-items: center; justify-content: center; 
-            backdrop-filter: blur(10px);
-        }
-        .logo-circle {
-            width: 60px; height: 60px; background: linear-gradient(135deg, #3b82f6, #2563eb);
-            border-radius: 18px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.8rem; color: white; margin-bottom: 20px;
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.5);
-            animation: floatUp 1s ease-out;
-        }
+        /* Nav */
+        .nav-container { display: flex; justify-content: center; margin-bottom: 20px; }
+        .nav-toggle { background: #111827; border: 1px solid #1f2937; border-radius: 50px; padding: 5px; display: flex; width: 100%; max-width: 400px; }
+        .tab-btn { flex: 1; border: none; background: transparent; color: #9ca3af; padding: 10px; border-radius: 40px; font-weight: 600; transition: 0.3s; }
+        .tab-btn.active { background: #3b82f6; color: white; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+        
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        
+        /* Тізім */
+        .tx-item { background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; opacity: 0; animation: slideUp 0.5s ease-out forwards; }
+        .tx-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-right: 15px; }
+        .icon-exp { background: rgba(239, 68, 68, 0.15); color: #ef4444; } .icon-inc { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+        .tx-cat { color: #cbd5e1; font-weight: 600; } .tx-date { color: #64748b; font-size: 0.85rem; margin-left: 10px; } .tx-amt { font-weight: bold; font-size: 1.1rem; margin-right: 15px; }
+        .text-red { color: #ef4444; } .text-green { color: #10b981; }
+        .btn-del { background: transparent; border: none; color: #64748b; } .btn-del:hover { color: #ef4444; }
     </style>
 </head>
 <body>
 
     <div id="auth-screen" class="login-overlay">
-        <div class="form-auth animate-up">
-            <div class="d-flex justify-content-center"><div class="logo-circle"><i class="fas fa-wallet"></i></div></div>
-            <h3 class="fw-bold mb-4 text-white">Жүйеге кіру</h3>
+        <div class="form-auth animate-up text-center" style="width: 400px;">
+            <div class="d-flex justify-content-center mb-4"><div class="logo-circle"><i class="fas fa-wallet"></i></div></div>
+            <h3 class="fw-bold mb-4" id="auth-title">Жүйеге кіру</h3>
             
-            <div id="register-fields" style="display: none;" class="mb-3">
-                <input type="text" id="reg-username" class="form-control" placeholder="Атыңыз (Username)">
+            <div id="register-fields" style="display: none;">
+                <input type="text" id="reg-username" class="form-control mb-3" placeholder="Атыңыз (Username)">
             </div>
-            
             <input type="email" id="auth-email" class="form-control mb-3" placeholder="admin@test.kz" value="admin@test.kz">
             <input type="password" id="auth-password" class="form-control mb-4" placeholder="••••••" value="123">
             
-            <button onclick="handleAuth()" class="btn-add mb-4" id="auth-btn">Кіру</button>
-            
-            <p class="text-secondary small" style="cursor: pointer; transition: 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'" onclick="toggleAuthMode()">
+            <button onclick="handleAuth()" class="btn-add mb-3" id="auth-btn">Кіру</button>
+            <p class="text-secondary small" style="cursor: pointer;" onclick="toggleAuthMode()">
                 <span id="auth-switch-text">Аккаунтыңыз жоқ па? Тіркелу</span>
             </p>
             <p id="error-msg" class="text-danger mt-2 small fw-bold" style="display:none;"></p>
@@ -228,20 +154,23 @@
         
         <div class="header-bar animate-up">
             <div class="d-flex align-items-center gap-3">
-                <div class="logo-circle" style="width: 45px; height: 45px; font-size: 1.4rem;"><i class="fas fa-chart-pie"></i></div>
-                <div>
-                    <h4 class="fw-bold m-0 text-white">Төлемдер мен Шығындар</h4>
-                    <small class="text-secondary">Қаржылық бақылау жүйесі</small>
+                <div class="logo-circle"><i class="fas fa-wallet"></i></div> <div>
+                    <h4 class="fw-bold m-0">Төлемдер мен Шығындарды Бақылау</h4>
+                    <small class="text-secondary">Кірістер мен шығындарды бір жерде бақылаңыз</small>
                 </div>
             </div>
             
             <div class="d-flex align-items-center gap-3">
-                <div class="text-end d-none d-md-block">
-                    <div class="fw-bold text-white" id="user-name">User</div>
-                    <div class="small text-secondary" id="user-email">email@...</div>
+                <div class="profile-box d-none d-md-flex">
+                    <div class="user-icon"><i class="fas fa-user"></i></div>
+                    <div class="text-start">
+                        <div class="fw-bold small lh-1" id="user-name">User</div>
+                        <div class="small text-secondary lh-1 mt-1" id="user-email">...</div>
+                    </div>
                 </div>
-                <button onclick="logout()" class="btn btn-outline-danger btn-sm rounded-pill px-3 border-2 fw-bold">
-                    <i class="fas fa-sign-out-alt me-2"></i> Шығу
+
+                <button onclick="logout()" class="btn btn-outline-danger btn-sm rounded-pill px-3 d-flex align-items-center gap-2" style="border: 1px solid #ef4444; color: #ef4444;">
+                    <i class="fas fa-sign-out-alt"></i> Шығу
                 </button>
             </div>
         </div>
@@ -249,8 +178,7 @@
         <div class="row g-4">
             <div class="col-lg-4">
                 <div class="form-panel animate-up delay-1 h-100">
-                    <h5 class="mb-4 text-white fw-bold"><i class="fas fa-plus-circle me-2 text-primary"></i>Жаңа жазба</h5>
-                    
+                    <h5 class="mb-4">Транзакция қосу</h5>
                     <div class="type-toggle">
                         <button id="btn-expense" class="toggle-btn active-expense" onclick="setType('expense')">
                             <i class="fas fa-arrow-circle-down me-2"></i> Шығын
@@ -259,31 +187,25 @@
                             <i class="fas fa-arrow-circle-up me-2"></i> Төлем
                         </button>
                     </div>
-
-                    <label class="small text-secondary mb-1 ps-1">Сома (₸)</label>
-                    <input type="number" id="amount" class="form-control mb-3 fs-5 fw-bold" placeholder="0">
-
+                    <label class="small text-secondary mb-1">Сома (₸)</label>
+                    <input type="number" id="amount" class="form-control mb-3" placeholder="0">
                     <div id="cat-wrapper">
-                        <label class="small text-secondary mb-1 ps-1">Санат</label>
+                        <label class="small text-secondary mb-1">Санат</label>
                         <select id="cat-id" class="form-select mb-3">
                             <option value="1">🍔 Тамақ</option><option value="2">🚌 Көлік</option><option value="3">🛍️ Сатып алу</option>
                             <option value="4">🎮 Ойын-сауық</option><option value="5">💡 Коммуналдық</option><option value="6">💊 Денсаулық</option>
                             <option value="7">🎓 Білім</option><option value="8">✈️ Саяхат</option><option value="9">📦 Басқа</option>
                         </select>
                     </div>
-
-                    <label class="small text-secondary mb-1 ps-1">Күні</label>
+                    <label class="small text-secondary mb-1">Күні</label>
                     <input type="date" id="date" class="form-control mb-3">
-
-                    <label class="small text-secondary mb-1 ps-1">Сипаттама</label>
-                    <textarea id="desc" class="form-control mb-4" rows="3" placeholder="Мысалы: Такси, Кино..."></textarea>
-
-                    <button onclick="addTransaction()" class="btn-add shadow-lg">Қосу <i class="fas fa-check ms-2"></i></button>
+                    <label class="small text-secondary mb-1">Сипаттама</label>
+                    <textarea id="desc" class="form-control mb-4" rows="3" placeholder="Сипаттама..."></textarea>
+                    <button onclick="addTransaction()" class="btn-add">Қосу</button>
                 </div>
             </div>
 
             <div class="col-lg-8">
-                
                 <div class="nav-container animate-up delay-2">
                     <div class="nav-toggle">
                         <button class="tab-btn active" onclick="switchTab('dashboard')" id="tab-dashboard">Шолу</button>
@@ -293,54 +215,46 @@
 
                 <div id="view-dashboard" class="animate-up delay-3">
                     <div class="row g-3 mb-4">
-                        <div class="col-md-4"><div class="stat-card card-green"><span class="small text-white-50">Төлемдер</span><h3 id="total-income" class="mb-0 fw-bold">0 ₸</h3></div></div>
-                        <div class="col-md-4"><div class="stat-card card-red"><span class="small text-white-50">Шығындар</span><h3 id="total-expenses" class="mb-0 fw-bold">0 ₸</h3></div></div>
-                        <div class="col-md-4"><div class="stat-card card-blue"><span class="small text-white-50">Баланс</span><h3 id="net-balance" class="mb-0 fw-bold">0 ₸</h3></div></div>
+                        <div class="col-md-4"><div class="stat-card card-green"><small class="text-secondary">Төлемдер</small><h3 id="total-income" class="mb-0 fw-bold">0 ₸</h3></div></div>
+                        <div class="col-md-4"><div class="stat-card card-red"><small class="text-secondary">Шығындар</small><h3 id="total-expenses" class="mb-0 fw-bold">0 ₸</h3></div></div>
+                        <div class="col-md-4"><div class="stat-card card-blue"><small class="text-secondary">Баланс</small><h3 id="net-balance" class="mb-0 fw-bold">0 ₸</h3></div></div>
                     </div>
-
                     <div class="custom-panel p-4 mb-4">
-                        <h5 class="mb-4 text-white">Соңғы 7 күннің белсенділігі</h5>
-                        <div style="height: 280px;"><canvas id="barChart"></canvas></div>
+                        <h5 class="mb-4">Соңғы 7 күн</h5>
+                        <div style="height: 250px;"><canvas id="barChart"></canvas></div>
                     </div>
-
                     <div class="custom-panel p-4">
-                        <h5 class="mb-3 text-white">Шығындар құрылымы</h5>
+                        <h5 class="mb-3">Санаттар бойынша</h5>
                         <div style="height: 250px; display: flex; justify-content: center;"><canvas id="doughnutChart"></canvas></div>
                     </div>
                 </div>
 
                 <div id="view-transactions" style="display: none;" class="animate-up delay-3">
-                    <div class="row mb-4">
-                        <div class="col-md-8"><input type="text" id="search-input" class="form-control" placeholder="🔍 Транзакцияларды іздеу..." oninput="filterData()"></div>
+                    <div class="row mb-3">
+                        <div class="col-md-8"><input type="text" id="search-input" class="form-control" placeholder="🔍 Іздеу..." oninput="filterData()"></div>
                         <div class="col-md-4">
                             <select id="filter-type" class="form-select" onchange="filterData()">
-                                <option value="all">Барлық түрлер</option><option value="income">Төлемдер</option><option value="expense">Шығындар</option>
+                                <option value="all">Барлығы</option><option value="income">Төлемдер</option><option value="expense">Шығындар</option>
                             </select>
                         </div>
                     </div>
-
-                    <div id="transaction-list">
-                        <div class="text-center text-secondary py-5">Жүктелуде...</div>
-                    </div>
+                    <div id="transaction-list"></div>
                 </div>
-
             </div>
         </div>
     </div>
 
     <script>
-        // СІЗДІҢ RENDER СІЛТЕМЕҢІЗ (немесе localhost)
-        const API_URL = "https://expense-tracker-api-iy65.onrender.com"; 
+        const API_URL = "https://expense-tracker-api-iy65.onrender.com";
         let token = localStorage.getItem("access_token");
         let currentType = 'expense';
         let isLoginMode = true;
         let allTransactions = [];
-        const catNames = { 1: "Тамақ", 2: "Көлік", 3: "Сатып алу", 4: "Ойын-сауық", 5: "Коммуналдық", 6: "Денсаулық", 7: "Білім", 8: "Саяхат", 9: "Басқа" };
+        const catNames = { 1: "Тамақ", 2: "Көлік", 3: "Сатып алу", 4: "Ойын-сауық", 5: "Төлемдер", 6: "Денсаулық", 7: "Білім", 8: "Саяхат", 9: "Басқа" };
 
         document.getElementById('date').valueAsDate = new Date();
         if (token) showApp();
 
-        // --- TABS ---
         function switchTab(tab) {
             document.getElementById('view-dashboard').style.display = tab === 'dashboard' ? 'block' : 'none';
             document.getElementById('view-transactions').style.display = tab === 'transactions' ? 'block' : 'none';
@@ -348,36 +262,33 @@
             document.getElementById('tab-transactions').className = tab === 'transactions' ? 'tab-btn active' : 'tab-btn';
         }
 
-        // --- ADD FORM TOGGLE ---
         function setType(type) {
             currentType = type;
             const btnExp = document.getElementById('btn-expense');
             const btnInc = document.getElementById('btn-income');
             if (type === 'expense') {
-                btnExp.className = 'toggle-btn active-expense';
-                btnInc.className = 'toggle-btn';
+                btnExp.className = 'toggle-btn active-expense'; btnInc.className = 'toggle-btn';
                 document.getElementById('cat-wrapper').style.display = 'block';
             } else {
-                btnInc.className = 'toggle-btn active-income';
-                btnExp.className = 'toggle-btn';
+                btnInc.className = 'toggle-btn active-income'; btnExp.className = 'toggle-btn';
                 document.getElementById('cat-wrapper').style.display = 'none';
             }
         }
 
-        // --- AUTH ---
         function toggleAuthMode() {
             isLoginMode = !isLoginMode;
             document.getElementById("auth-title").innerText = isLoginMode ? "Жүйеге кіру" : "Тіркелу";
             document.getElementById("auth-btn").innerText = isLoginMode ? "Кіру" : "Тіркелу";
             document.getElementById("auth-switch-text").innerText = isLoginMode ? "Аккаунтыңыз жоқ па? Тіркелу" : "Аккаунтыңыз бар ма? Кіру";
             document.getElementById("register-fields").style.display = isLoginMode ? "none" : "block";
+            document.getElementById("error-msg").style.display = "none";
         }
 
         async function handleAuth() {
             const email = document.getElementById("auth-email").value;
             const password = document.getElementById("auth-password").value;
             const btn = document.getElementById("auth-btn");
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Күте тұрыңыз...';
+            btn.innerText = "Күте тұрыңыз...";
             
             if (isLoginMode) {
                 const fd = new FormData(); fd.append("username", email); fd.append("password", password);
@@ -397,9 +308,16 @@
                 const username = document.getElementById("reg-username").value;
                 try {
                     const res = await fetch(`${API_URL}/users/`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, email, password }) });
-                    if (res.ok) { alert("Сәтті тіркелдіңіз!"); toggleAuthMode(); } else { alert("Тіркелу қатесі!"); }
+                    if (res.ok) { 
+                        alert("Сәтті тіркелдіңіз! Енді кіріңіз."); 
+                        toggleAuthMode(); 
+                        document.getElementById("auth-password").value = ""; 
+                    } else { 
+                        const err = await res.json();
+                        alert("Тіркелу қатесі: " + (err.detail || "Белгісіз қате")); 
+                    }
                     btn.innerText = "Тіркелу";
-                } catch (e) { console.error(e); btn.innerText = "Тіркелу"; }
+                } catch (e) { console.error(e); btn.innerText = "Тіркелу"; alert("Сервер қатесі!"); }
             }
         }
 
@@ -421,7 +339,6 @@
         }
 
         async function loadData() {
-            // Animation Counter Function
             const animateValue = (id, start, end, duration) => {
                 const obj = document.getElementById(id);
                 let startTimestamp = null;
@@ -436,7 +353,6 @@
 
             const resBal = await fetch(`${API_URL}/balance/`, { headers: { "Authorization": `Bearer ${token}` } });
             const bal = await resBal.json();
-            
             animateValue("total-income", 0, bal.total_income, 1000);
             animateValue("total-expenses", 0, bal.total_expenses, 1000);
             animateValue("net-balance", 0, bal.net_balance, 1000);
@@ -445,7 +361,6 @@
                 fetch(`${API_URL}/expenses/`, { headers: { "Authorization": `Bearer ${token}` } }),
                 fetch(`${API_URL}/incomes/`, { headers: { "Authorization": `Bearer ${token}` } })
             ]);
-            
             const exp = resExp.ok ? await resExp.json() : [];
             const inc = resInc.ok ? await resInc.json() : [];
 
@@ -479,16 +394,13 @@
             if(res.ok) {
                 document.getElementById("amount").value = "";
                 document.getElementById("desc").value = "";
-                // Кішкентай хабарлама (Toast)
                 const btn = document.querySelector('.btn-add');
-                const originalText = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-check"></i> Қосылды!';
-                btn.style.background = '#10b981';
-                setTimeout(() => { btn.innerHTML = originalText; btn.style.background = ''; }, 2000);
+                setTimeout(() => { btn.innerText = 'Қосу'; }, 1500);
                 loadData();
             } else {
                 const err = await res.json();
-                alert("Қате: " + (err.detail ? JSON.stringify(err.detail) : "Белгісіз қате"));
+                alert("Қате: " + (err.detail ? JSON.stringify(err.detail) : "Санат таңдалмады ма?"));
             }
         }
 
@@ -511,33 +423,26 @@
 
             data.forEach((item, index) => {
                 const isExp = item.type === 'expense';
-                const dateStr = new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const dateStr = new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 const catName = isExp ? (catNames[item.category_id] || "Басқа") : (item.description || "Төлем");
-                
-                // Stagger animation delay
                 const delay = index * 0.05; 
-
+                
                 const html = `
                     <div class="tx-item" style="animation-delay: ${delay}s">
                         <div class="d-flex align-items-center">
-                            <div class="tx-icon-circle ${isExp ? 'tx-expense' : 'tx-income'}">
-                                <i class="fas ${isExp ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
-                            </div>
+                            <div class="tx-icon ${isExp ? 'icon-exp' : 'icon-inc'}"><i class="fas ${isExp ? 'fa-arrow-down' : 'fa-arrow-up'}"></i></div>
                             <div>
-                                <span class="tx-tag">${catName}</span>
-                                <span class="tx-date ms-2">${dateStr}</span>
+                                <div class="tx-cat">${catName}</div>
+                                <div class="tx-date">${dateStr}</div>
                             </div>
                         </div>
                         <div class="d-flex align-items-center">
                             <span class="tx-amt ${isExp ? 'text-red' : 'text-green'}">
                                 ${isExp ? '-' : '+'} ${item.amount.toLocaleString()} ₸
                             </span>
-                            <button class="btn-del ms-3" onclick="deleteItem(${item.id}, '${item.type}')">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
+                            <button class="btn-del ms-2" onclick="deleteItem(${item.id}, '${item.type}')"><i class="fas fa-trash-alt"></i></button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 list.innerHTML += html;
             });
         }
@@ -550,7 +455,6 @@
             loadData();
         }
 
-        // --- CHARTS ---
         let barInstance = null, doughnutInstance = null;
         function drawDoughnut(data) {
             const ctx = document.getElementById('doughnutChart');
@@ -559,21 +463,11 @@
                 type: 'doughnut',
                 data: {
                     labels: data.map(i => i.category_name),
-                    datasets: [{ 
-                        data: data.map(i => i.total_amount), 
-                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6366f1'], 
-                        borderWidth: 0,
-                        hoverOffset: 15
-                    }]
+                    datasets: [{ data: data.map(i => i.total_amount), backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'], borderWidth: 0 }]
                 },
-                options: { 
-                    responsive: true, maintainAspectRatio: false, 
-                    plugins: { legend: { position: 'right', labels: { color: 'white', font: {size: 12}, padding: 20 } } },
-                    animation: { animateScale: true, animateRotate: true }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: 'white' } } } }
             });
         }
-
         function drawBarChartFromData(data) {
             const ctx = document.getElementById('barChart');
             if (barInstance) barInstance.destroy();
@@ -593,19 +487,11 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Төлем', data: incData, backgroundColor: '#10b981', borderRadius: 6, barPercentage: 0.6 },
-                        { label: 'Шығын', data: expData, backgroundColor: '#ef4444', borderRadius: 6, barPercentage: 0.6 }
+                        { label: 'Төлем', data: incData, backgroundColor: '#10b981', borderRadius: 4 },
+                        { label: 'Шығын', data: expData, backgroundColor: '#ef4444', borderRadius: 4 }
                     ]
                 },
-                options: { 
-                    responsive: true, maintainAspectRatio: false, 
-                    plugins: { legend: { labels: { color: 'white' } } }, 
-                    scales: { 
-                        x: { ticks: { color: '#94a3b8' }, grid: {display:false} }, 
-                        y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155', borderDash: [5, 5] }, beginAtZero: true } 
-                    },
-                    animation: { duration: 2000, easing: 'easeOutQuart' }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: 'white' } } }, scales: { x: { ticks: { color: '#9ca3af' }, grid: {display:false} }, y: { ticks: { color: '#9ca3af' }, grid: { color: '#374151' } } } }
             });
         }
     </script>
