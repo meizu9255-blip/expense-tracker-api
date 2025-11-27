@@ -3,10 +3,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# Бұл код: "Егер серверде болсам, сервердің базасын ал. Егер компьютерде болсам, localhost-ты ал" дейді.
+# Енді код автоматты түрде: Серверде ме, әлде компьютерде ме — өзі түсінеді
 SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:1234@localhost/expense_db")
 
-# Render-дегі базаның адресі кейде "postgres://" деп басталады, оны "postgresql://" деп түзетеміз
 if SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
     SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
