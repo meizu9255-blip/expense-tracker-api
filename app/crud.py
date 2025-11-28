@@ -31,14 +31,15 @@ def create_user_category(db: Session, category: schemas.CategoryCreate, user_id:
 def get_user_categories(db: Session, user_id: int):
     return db.query(models.Category).filter(models.Category.user_id == user_id).all()
 
-# 3. EXPENSE (ОСЫ ЖЕРДЕ ҚАТЕ БОЛҒАН - ТҮЗЕТІЛДІ)
+# 3. EXPENSE (ТҮЗЕТІЛГЕН БӨЛІК)
 def create_user_expense(db: Session, expense: schemas.ExpenseCreate, user_id: int):
     db_expense = models.Expense(
         amount=expense.amount,
         description=expense.description,
         category_id=expense.category_id,
         user_id=user_id,
-        date=expense.date  # <--- БҰРЫН ОСЫ ЖЕРДЕ expense.expense_date ТҰРҒАН
+        # Мұнда "expense.date" қолданылуы керек
+        date=expense.date 
     )
     db.add(db_expense)
     db.commit()
@@ -68,14 +69,15 @@ def update_user_expense(db: Session, expense_id: int, expense_update: schemas.Ex
     db.refresh(db_expense)
     return db_expense
 
-# 4. INCOME (ОСЫ ЖЕР ДЕ ТҮЗЕТІЛДІ)
+# 4. INCOME (ТҮЗЕТІЛГЕН БӨЛІК)
 def create_user_income(db: Session, income: schemas.IncomeCreate, user_id: int):
     db_income = models.Income(
         amount=income.amount,
         description=income.description,
         category_id=income.category_id,
         user_id=user_id,
-        date=income.date  # <--- БҰРЫН ОСЫ ЖЕРДЕ income.income_date ТҰРҒАН
+        # Мұнда "income.date" қолданылуы керек
+        date=income.date 
     )
     db.add(db_income)
     db.commit()
@@ -108,26 +110,3 @@ def get_expenses_by_category(db: Session, user_id: int):
         models.Expense.user_id == user_id
     ).group_by(models.Category.name).all()
     return [{"category_name": name, "total_amount": amount} for name, amount in results]
-
-# app/crud.py (Ең соңына)
-
-# ----------------------------------------------------
-# 7. BUDGET (Лимит) ЛОГИКАСЫ
-# ----------------------------------------------------
-def create_budget(db: Session, budget: schemas.BudgetCreate, user_id: int):
-    """Жаңа лимит қосу"""
-    db_budget = models.Budget(
-        limit_amount=budget.limit_amount,
-        category_id=budget.category_id,
-        start_date=budget.start_date,
-        end_date=budget.end_date,
-        user_id=user_id
-    )
-    db.add(db_budget)
-    db.commit()
-    db.refresh(db_budget)
-    return db_budget
-
-def get_user_budgets(db: Session, user_id: int):
-    """Қолданушының барлық лимиттерін алу"""
-    return db.query(models.Budget).filter(models.Budget.user_id == user_id).all()
