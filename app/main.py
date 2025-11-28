@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from fastapi.middleware.cors import CORSMiddleware # <--- CORS Импорты
+from fastapi.middleware.cors import CORSMiddleware  # <--- ЕҢ МАҢЫЗДЫСЫ
 from sqlalchemy.orm import Session
 from datetime import timedelta, datetime
 from typing import List
@@ -8,7 +8,7 @@ from jose import jwt, JWTError
 from . import models, database, schemas, crud, utils
 
 # -------------------------------------------------------------------------
-# 1. БАПТАУЛАР (SETTINGS)
+# 1. БАПТАУЛАР
 # -------------------------------------------------------------------------
 SECRET_KEY = "YOUR-ULTRA-SECRET-KEY" 
 ALGORITHM = "HS256"
@@ -17,18 +17,16 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 # Базаны құру
 database.Base.metadata.create_all(bind=database.engine)
 
-# Қосымшаны бастау
 app = FastAPI(title="Expense Tracker API")
 
 # -------------------------------------------------------------------------
-# 2. CORS БАПТАУЛАРЫ (ЕҢ МАҢЫЗДЫСЫ!)
-# Бұл код app = FastAPI() жолынан кейін бірден тұруы керек
+# 2. CORS БАПТАУЛАРЫ (Мұны міндетті түрде қосу керек)
 # -------------------------------------------------------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Барлық сайттарға рұқсат (Netlify үшін керек)
+    allow_origins=["*"],  # Барлық сайтқа рұқсат береміз
     allow_credentials=True,
-    allow_methods=["*"],  # GET, POST, PUT, DELETE - бәріне рұқсат
+    allow_methods=["*"],  # Барлық әдістерге рұқсат (GET, POST, DELETE, etc.)
     allow_headers=["*"],
 )
 
@@ -75,12 +73,11 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 # -------------------------------------------------------------------------
 # 4. API ЭНДПОЙНТТАРЫ
 # -------------------------------------------------------------------------
-
 @app.get("/")
 def read_root():
-    return {"message": "Server is running!"}
+    return {"message": "Server is running with CORS enabled!"}
 
-# --- AUTH ---
+# --- АВТОРИЗАЦИЯ ---
 @app.post("/users/", response_model=schemas.User)
 def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     if crud.get_user_by_email(db, email=user.email):
@@ -100,7 +97,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
 def read_users_me(current_user: schemas.User = Depends(get_current_user)):
     return current_user
 
-# --- CATEGORIES ---
+# --- КАТЕГОРИЯЛАР ---
 @app.post("/categories/", response_model=schemas.CategoryResponse)
 def add_category(category: schemas.CategoryCreate, db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.create_user_category(db, category, current_user.id)
@@ -109,7 +106,7 @@ def add_category(category: schemas.CategoryCreate, db: Session = Depends(get_db)
 def get_categories(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.get_user_categories(db, current_user.id)
 
-# --- EXPENSES ---
+# --- ШЫҒЫНДАР (EXPENSES) ---
 @app.post("/expenses/", response_model=schemas.ExpenseResponse)
 def add_expense(expense: schemas.ExpenseCreate, db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.create_user_expense(db, expense, current_user.id)
@@ -125,7 +122,7 @@ def delete_expense(expense_id: int, db: Session = Depends(get_db), current_user:
         raise HTTPException(status_code=404, detail="Not found")
     return {"message": "Deleted"}
 
-# --- INCOMES ---
+# --- КІРІСТЕР (INCOMES) ---
 @app.post("/incomes/", response_model=schemas.IncomeResponse)
 def add_income(income: schemas.IncomeCreate, db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.create_user_income(db, income, current_user.id)
@@ -134,7 +131,7 @@ def add_income(income: schemas.IncomeCreate, db: Session = Depends(get_db), curr
 def get_incomes(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.get_user_incomes(db, current_user.id)
 
-# --- BALANCE & STATS ---
+# --- БАЛАНС ---
 @app.get("/balance/", response_model=schemas.BalanceResponse)
 def get_balance(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.get_user_balance(db, current_user.id)
