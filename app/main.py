@@ -34,6 +34,13 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 database.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI(title="Expense Tracker API")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Барлық жақтан рұқсат беру
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # -------------------------------------------------------------------------
 # 2. CORS (Браузерге рұқсат беру - ӨТЕ МАҢЫЗДЫ)
