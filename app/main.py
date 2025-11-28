@@ -1,18 +1,18 @@
 from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer 
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from datetime import timedelta, datetime
 from typing import List, Annotated
-from jose import jwt, JWTError 
-from fastapi.middleware.cors import CORSMiddleware
-
-# Өз модульдерімізді импорттау
+from jose import jwt, JWTError
 from . import models, database, schemas, crud, utils
+from fastapi import FastAPI
+
 
 # -------------------------------------------------------------------------
-# 1. JWT БАПТАУЛАРЫ (Басқа файлдан немесе .env-ден алған дұрыс, бірақ осында қалдырдық)
+# 1. JWT БАПТАУЛАРЫ
 # -------------------------------------------------------------------------
-SECRET_KEY = "YOUR-ULTRA-SECRET-KEY"  # ⚠️ Өндірісте (Production) мұны міндетті түрде өзгерту керек!
+SECRET_KEY = "YOUR-ULTRA-SECRET-KEY" 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30 
 
@@ -34,20 +34,13 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 database.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI(title="Expense Tracker API")
+
+# -------------------------------------------------------------------------
+# 2. CORS (Браузерге рұқсат беру)
+# -------------------------------------------------------------------------
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Барлық жақтан рұқсат беру
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# -------------------------------------------------------------------------
-# 2. CORS (Браузерге рұқсат беру - ӨТЕ МАҢЫЗДЫ)
-# -------------------------------------------------------------------------
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Қауіпсіздік үшін нақты домендерді жазған дұрыс (мысалы: ["http://localhost:3000"])
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -85,7 +78,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     return user
 
 # -------------------------------------------------------------------------
-# 4. НЕГІЗГІ API ЭНДПОЙНТТАРЫ
+# 4. API ЭНДПОЙНТТАРЫ
 # -------------------------------------------------------------------------
 
 @app.get("/")
@@ -216,11 +209,8 @@ def get_expense_stats(
 ):
     return crud.get_expenses_by_category(db, current_user.id)
 
-# app/main.py (Ең соңына)
+# --- БЮДЖЕТ (BUDGET) ---
 
-# -------------------------------------------------------------------------
-# 8. BUDGET (БЮДЖЕТ) API
-# -------------------------------------------------------------------------
 @app.post("/budgets/", response_model=schemas.BudgetResponse)
 def create_budget(
     budget: schemas.BudgetCreate, 
