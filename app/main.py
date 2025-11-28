@@ -208,3 +208,23 @@ def get_expense_stats(
     current_user: schemas.User = Depends(get_current_user)
 ):
     return crud.get_expenses_by_category(db, current_user.id)
+
+# app/main.py (Ең соңына)
+
+# -------------------------------------------------------------------------
+# 8. BUDGET (БЮДЖЕТ) API
+# -------------------------------------------------------------------------
+@app.post("/budgets/", response_model=schemas.BudgetResponse)
+def create_budget(
+    budget: schemas.BudgetCreate, 
+    db: Session = Depends(get_db), 
+    current_user: schemas.User = Depends(get_current_user)
+):
+    return crud.create_budget(db, budget, current_user.id)
+
+@app.get("/budgets/", response_model=List[schemas.BudgetResponse])
+def read_budgets(
+    db: Session = Depends(get_db), 
+    current_user: schemas.User = Depends(get_current_user)
+):
+    return crud.get_user_budgets(db, current_user.id)
