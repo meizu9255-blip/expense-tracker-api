@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qarjy Baqylau Pro</title>
+    <title>Qarjy Pro - Final</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -21,11 +21,11 @@
             min-height: 100vh;
         }
 
-        /* INPUT ӨРІСТЕРІ (Текст анық көріну үшін) */
+        /* INPUT ӨРІСТЕРІ */
         .form-control, .form-select {
-            background-color: #334155 !important; /* Қою сұр */
+            background-color: #334155 !important;
             border: 1px solid #475569;
-            color: #ffffff !important; /* Ақ әріп */
+            color: #ffffff !important;
             border-radius: 10px; padding: 12px;
             font-size: 0.95rem;
         }
@@ -33,7 +33,7 @@
             border-color: #3b82f6; 
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); 
         }
-        /* Autofill түсін өзгерту */
+        /* Autofill түсін өзгерту (Браузер есте сақтағанда ақ болып кетпеу үшін) */
         input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
             -webkit-box-shadow: 0 0 0 30px #334155 inset !important;
             -webkit-text-fill-color: white !important;
@@ -88,6 +88,10 @@
             <input type="password" id="password" class="form-control mb-4" placeholder="••••••" value="123">
             <button onclick="login()" class="btn-submit">Кіру</button>
             <p id="error-msg" class="text-danger mt-3 small" style="display:none;">Қате деректер!</p>
+            
+            <div class="mt-3">
+                <small class="text-secondary">Аккаунтыңыз жоқ па? <a href="register.html" class="text-primary text-decoration-none fw-bold">Тіркелу</a></small>
+            </div>
         </div>
     </div>
 
@@ -174,14 +178,20 @@
                 </div>
 
                 <div class="custom-panel p-4 mb-4 animate-up" style="animation-delay: 0.3s;">
-                    <h5 class="mb-4">Соңғы 7 күннің белсенділігі</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                         <h5 class="mb-0">Соңғы 7 күннің белсенділігі</h5>
+                         <a href="transactions.html" class="btn btn-outline-info btn-sm">
+                             <i class="fas fa-list"></i> Толық тарих
+                         </a>
+                    </div>
+                   
                     <div style="height: 300px;">
                         <canvas id="barChart"></canvas>
                     </div>
                 </div>
 
                 <div class="custom-panel p-4 animate-up" style="animation-delay: 0.4s;">
-                    <h5 class="mb-3">Санаттар бойынша шығындар</h5>
+                    <h5 class="mb-3">Шығындар құрылымы</h5>
                     <div style="height: 250px; display: flex; justify-content: center;">
                         <canvas id="doughnutChart"></canvas>
                     </div>
@@ -191,17 +201,17 @@
     </div>
 
     <script>
-        // МЫНА СІЛТЕМЕ RENDER-ГЕ БАРАДЫ (Интернеттегі сервер)
+        // RENDER URL - МІНДЕТТІ ТҮРДЕ ОСЫ БОЛУЫ КЕРЕК
         const API_URL = "https://expense-tracker-api-iy65.onrender.com";
         
         let token = localStorage.getItem("access_token");
         let currentType = 'expense';
 
-        document.getElementById('date').valueAsDate = new Date(); // Бүгінгі күнді қою
+        // Бүгінгі күнді автоматты қою
+        document.getElementById('date').valueAsDate = new Date();
 
         if (token) showDashboard();
 
-        // ТИПТІ АУЫСТЫРУ (Шығын <-> Төлем)
         function setType(type) {
             currentType = type;
             const btnExp = document.getElementById('btn-expense');
@@ -211,15 +221,14 @@
             if (type === 'expense') {
                 btnExp.className = 'btn-toggle active-expense';
                 btnInc.className = 'btn-toggle btn-toggle-inactive';
-                catWrapper.style.display = 'block'; // Шығынға санат керек
+                catWrapper.style.display = 'block';
             } else {
                 btnInc.className = 'btn-toggle active-income';
                 btnExp.className = 'btn-toggle btn-toggle-inactive';
-                catWrapper.style.display = 'none'; // Төлемге санат керек емес
+                catWrapper.style.display = 'none';
             }
         }
 
-        // ЛОГИН
         async function login() {
             const fd = new FormData();
             fd.append("username", document.getElementById("email").value);
@@ -255,7 +264,6 @@
             } catch (e) { console.error("Error loading user profile:", e); }
         }
 
-        // --- ДЕРЕКТЕРДІ ЖҮКТЕУ ---
         async function loadData() {
             // 1. Баланс
             const resBal = await fetch(`${API_URL}/balance/`, { headers: { "Authorization": `Bearer ${token}` } });
@@ -269,16 +277,14 @@
             const stats = await resStat.json();
             drawDoughnut(stats);
 
-            // 3. Графикті салу
+            // 3. График
             await fetchAndDrawBarChart();
         }
 
-        // ГРАФИК ДЕРЕКТЕРІН ДАЙЫНДАУ
         async function fetchAndDrawBarChart() {
             const labels = [];
             const dateMap = {};
             
-            // Соңғы 7 күнді дайындау
             for (let i = 6; i >= 0; i--) {
                 const d = new Date();
                 d.setDate(d.getDate() - i);
@@ -301,7 +307,7 @@
                 if (resExp.ok) {
                     const expenses = await resExp.json();
                     expenses.forEach(item => {
-                        // date өрісін дұрыс оқу
+                        // Күнді дұрыс оқу (server 'date' немесе 'created_at' қайтаруы мүмкін)
                         const itemDate = (item.date || item.created_at || '').split('T')[0];
                         if (itemDate && dateMap[itemDate]) {
                             expenseData[dateMap[itemDate].index] += item.amount;
@@ -324,24 +330,26 @@
             drawBarChart(labels, incomeData, expenseData);
         }
 
-        // --- ТРАНЗАКЦИЯ ҚОСУ (ТҮЗЕТІЛГЕН) ---
         async function addTransaction() {
             const amount = document.getElementById("amount").value;
+            
             if (!amount || amount <= 0) {
-                alert("Соманы дұрыс енгізіңіз!"); return;
+                alert("Соманы дұрыс енгізіңіз!");
+                return;
             }
 
-            // Деректерді дайындау
             const body = { 
                 amount: parseFloat(amount),
                 description: document.getElementById("desc").value,
-                date: document.getElementById("date").value 
+                date: document.getElementById("date").value // Күнді міндетті түрде жібереміз
             };
 
-            // Егер ШЫҒЫН болса, Санат ID міндетті
             if (currentType === 'expense') {
                 const catId = document.getElementById("cat-id").value;
-                if (!catId) { alert("Санатты таңдаңыз!"); return; }
+                if (!catId) { 
+                    alert("Шығын қосу үшін санатты таңдау міндетті!"); 
+                    return; 
+                }
                 body.category_id = parseInt(catId);
             }
 
@@ -354,15 +362,17 @@
 
                 if (response.ok) {
                     alert("Сәтті қосылды!");
-                    // Өрістерді тазалау
                     document.getElementById("amount").value = "";
                     document.getElementById("desc").value = "";
-                    // Деректерді жаңарту (График бірден өзгеруі керек)
+                    // Деректерді қайта жүктеу (график жаңарады)
                     loadData(); 
                 } else {
                     const error = await response.json();
                     let errorMsg = "Қате шықты!";
-                    if (error.detail) errorMsg = JSON.stringify(error.detail);
+                    if (error.detail) {
+                         // Сервер қатесін толық көрсету
+                         errorMsg = typeof error.detail === 'string' ? error.detail : JSON.stringify(error.detail);
+                    }
                     alert("Сервер қатесі: " + errorMsg);
                 }
             } catch (e) {
@@ -371,7 +381,7 @@
             }
         }
 
-        // --- ГРАФИКТЕРДІ СЫЗУ ---
+        // --- ГРАФИКТЕР ---
         let barInstance = null;
         let doughnutInstance = null;
 
@@ -404,8 +414,8 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Төлемдер', data: incomeData, backgroundColor: '#10b981', borderRadius: 4 },
-                        { label: 'Шығындар', data: expenseData, backgroundColor: '#ef4444', borderRadius: 4 }
+                        { label: 'Төлемдер', data: incomeData, backgroundColor: '#10b981', borderRadius: 4, barPercentage: 0.6 },
+                        { label: 'Шығындар', data: expenseData, backgroundColor: '#ef4444', borderRadius: 4, barPercentage: 0.6 }
                     ]
                 },
                 options: {
