@@ -101,3 +101,23 @@ def get_balance(db: Session = Depends(get_db), current_user: schemas.User = Depe
 @app.get("/statistics/expenses/", response_model=List[schemas.CategoryStats])
 def get_stats(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.get_expenses_by_category(db, current_user.id)
+# app/main.py (ФАЙЛДЫҢ ЕҢ СОҢЫНА ҚОСЫҢЫЗ)
+
+@app.on_event("startup")
+def startup_populate_categories():
+    db = database.SessionLocal()
+    # Егер базада санаттар жоқ болса, біз оларды қосамыз
+    if db.query(models.Category).count() == 0:
+        # Алдымен админді табамыз (ID=1 болуы керек)
+        user = db.query(models.User).first()
+        if user:
+            categories = [
+                "Тамақ", "Көлік", "Сатып алу", "Ойын-сауық", 
+                "Коммуналдық", "Денсаулық", "Білім", "Саяхат", "Басқа"
+            ]
+            for cat_name in categories:
+                new_cat = models.Category(name=cat_name, user_id=user.id)
+                db.add(new_cat)
+            db.commit()
+            print("✅ Санаттар сәтті қосылды!")
+    db.close()
