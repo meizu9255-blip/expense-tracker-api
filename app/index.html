@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qarjy Baqylau Pro</title>
+    <title>Qarjy Pro - Final</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,7 +11,7 @@
     <style>
         /* --- 1. АНИМАЦИЯ (Smooth Slide Up) --- */
         @keyframes slideUp {
-            from { transform: translateY(40px); opacity: 0; }
+            from { transform: translateY(50px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
         
@@ -20,15 +20,15 @@
             opacity: 0; 
         }
         
-        /* Кезекпен шығу (Stagger) */
+        /* Кезекпен шығу (Stagger Effect) */
         .delay-1 { animation-delay: 0.1s; }
         .delay-2 { animation-delay: 0.2s; }
         .delay-3 { animation-delay: 0.3s; }
         .delay-4 { animation-delay: 0.4s; }
 
-        /* --- 2. ДИЗАЙН (Premium Dark) --- */
+        /* --- 2. ДИЗАЙН (Figma Dark Theme) --- */
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
             color: #ffffff;
             font-family: 'Segoe UI', sans-serif;
             min-height: 100vh;
@@ -39,7 +39,7 @@
         .form-panel, .custom-panel, .header-bar, .form-auth {
             background: #111827;
             border: 1px solid #1f2937;
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 25px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.4);
             transition: transform 0.3s ease;
@@ -62,7 +62,12 @@
             border-color: #3b82f6;
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
         }
-        
+        /* Автотолтыру түсін түзеу */
+        input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 30px #1f2937 inset !important;
+            -webkit-text-fill-color: white !important;
+        }
+
         /* Карточкалар */
         .stat-card {
             background: #1e293b;
@@ -84,7 +89,6 @@
         }
         .btn-add:hover { box-shadow: 0 0 20px rgba(37, 99, 235, 0.5); transform: translateY(-2px); }
 
-        /* Ауыстырғыш (Toggle) */
         .type-toggle { display: flex; background: #1f2937; padding: 4px; border-radius: 12px; margin-bottom: 20px; }
         .toggle-btn { flex: 1; padding: 10px; border: none; background: transparent; color: #9ca3af; font-weight: 600; border-radius: 10px; transition: 0.3s; }
         .toggle-btn.active-expense { background: #ef4444; color: white; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); }
@@ -94,7 +98,7 @@
         .nav-container { display: flex; justify-content: center; margin-bottom: 20px; }
         .nav-toggle { background: #111827; border: 1px solid #334155; border-radius: 50px; padding: 5px; display: flex; width: 100%; max-width: 400px; }
         .tab-btn { flex: 1; border: none; background: transparent; color: #9ca3af; padding: 10px; border-radius: 40px; font-weight: 600; transition: 0.3s; }
-        .tab-btn.active { background: #2563eb; color: white; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+        .tab-btn.active { background: #3b82f6; color: white; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
 
         /* Login Overlay */
         .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 23, 0.95); z-index: 9999; display: flex; align-items: center; justify-content: center; }
@@ -122,7 +126,7 @@
                 <input type="text" id="reg-username" class="form-control mb-3" placeholder="Атыңыз (Username)">
             </div>
             
-            <input type="email" id="auth-email" class="form-control mb-3" placeholder="admin@test.kz" value="admin@test.kz">
+            <input type="email" id="auth-email" class="form-control mb-3" placeholder="Email (admin@test.kz)" value="admin@test.kz">
             <input type="password" id="auth-password" class="form-control mb-4" placeholder="••••••" value="123">
             
             <button onclick="handleAuth()" class="btn-add mb-3" id="auth-btn">Кіру</button>
@@ -158,7 +162,7 @@
         <div class="row g-4">
             <div class="col-lg-4">
                 <div class="form-panel animate-up delay-1 h-100">
-                    <h5 class="mb-4"><i class="fas fa-plus-circle me-2 text-primary"></i>Транзакция қосу</h5>
+                    <h5 class="mb-4"><i class="fas fa-plus-circle me-2 text-primary"></i>Жаңа жазба</h5>
                     <div class="type-toggle">
                         <button id="btn-expense" class="toggle-btn active-expense" onclick="setType('expense')">
                             <i class="fas fa-arrow-circle-down me-2"></i> Шығын
@@ -200,7 +204,7 @@
                         <div class="col-md-4"><div class="stat-card card-blue"><small class="text-secondary">Баланс</small><h3 id="net-balance" class="mb-0 fw-bold">0 ₸</h3></div></div>
                     </div>
                     <div class="custom-panel p-4 mb-4">
-                        <h5 class="mb-4">Жалпы статистика (Төлем vs Шығыс)</h5>
+                        <h5 class="mb-4">Соңғы 7 күн</h5>
                         <div style="height: 250px;"><canvas id="barChart"></canvas></div>
                     </div>
                     <div class="custom-panel p-4">
@@ -225,12 +229,7 @@
     </div>
 
     <script>
-        // --- СІЛТЕМЕ ---
-        // ЕГЕР КОМПЬЮТЕРДЕ ІСТЕТСЕҢІЗ:
-        const API_URL = "https://expense-tracker-api-iy65.onrender.com";
-        // ЕГЕР NETLIFY-ҒА САЛСАҢЫЗ, МЫНАНЫ ҚОЙЫҢЫЗ:
-        // 
-        
+        const API_URL = "https://expense-tracker-api-iy65.onrender.com"; // RENDER СЕРВЕРІ
         let token = localStorage.getItem("access_token");
         let currentType = 'expense';
         let isLoginMode = true;
@@ -279,13 +278,13 @@
                 const fd = new FormData(); fd.append("username", email); fd.append("password", password);
                 try {
                     const res = await fetch(`${API_URL}/token`, { method: "POST", body: fd });
-                    if (!res.ok) throw new Error();
+                    if (!res.ok) throw new Error("Логин немесе пароль қате");
                     const data = await res.json();
                     localStorage.setItem("access_token", data.access_token);
                     token = data.access_token;
                     showApp();
                 } catch { 
-                    document.getElementById("error-msg").innerText = "Қате деректер! Серверді тексеріңіз."; 
+                    document.getElementById("error-msg").innerText = "Қате деректер! (Сервер Render-де болса, 1 мин күтіңіз)"; 
                     document.getElementById("error-msg").style.display = "block"; 
                     btn.innerText = "Кіру";
                 }
@@ -360,23 +359,16 @@
             const resStat = await fetch(`${API_URL}/statistics/expenses/`, { headers: { "Authorization": `Bearer ${token}` } });
             const stats = resStat.ok ? await resStat.json() : [];
             drawDoughnut(stats);
-            drawBarChart(exp, inc);
+            drawBarChartFromData(allTransactions);
         }
 
         async function addTransaction() {
-            const amount = document.getElementById("amount").value;
-            if (!amount || amount <= 0) { alert("Соманы дұрыс енгізіңіз!"); return; }
-
             const body = { 
-                amount: parseFloat(amount),
+                amount: parseFloat(document.getElementById("amount").value),
                 description: document.getElementById("desc").value,
                 date: document.getElementById("date").value 
             };
-            if (currentType === 'expense') {
-                const catId = document.getElementById("cat-id").value;
-                if (!catId) { alert("Санат таңдалмады!"); return; }
-                body.category_id = parseInt(catId);
-            }
+            if (currentType === 'expense') body.category_id = parseInt(document.getElementById("cat-id").value);
 
             const res = await fetch(`${API_URL}/${currentType}s/`, {
                 method: "POST",
@@ -385,17 +377,19 @@
             });
 
             if(res.ok) {
+                // Toast хабарлама
                 const btn = document.querySelector('.btn-add');
+                const originalText = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-check"></i> Қосылды!';
                 btn.style.background = '#10b981';
-                setTimeout(() => { btn.innerHTML = 'Қосу'; btn.style.background = ''; }, 1500);
+                setTimeout(() => { btn.innerHTML = originalText; btn.style.background = ''; }, 1500);
                 
                 document.getElementById("amount").value = "";
                 document.getElementById("desc").value = "";
                 loadData();
             } else {
                 const err = await res.json();
-                alert("Қате: " + (err.detail ? JSON.stringify(err.detail) : "Белгісіз қате"));
+                alert("Қате: " + (err.detail ? JSON.stringify(err.detail) : "Санат таңдалмады ма?"));
             }
         }
 
@@ -418,7 +412,7 @@
 
             data.forEach((item, index) => {
                 const isExp = item.type === 'expense';
-                const dateStr = new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const dateStr = new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 const catName = isExp ? (catNames[item.category_id] || "Басқа") : (item.description || "Төлем");
                 const delay = index * 0.05; 
                 
@@ -444,8 +438,9 @@
 
         async function deleteItem(id, type) {
             if(!confirm("Өшіруге сенімдісіз бе?")) return;
-            if(type === 'income') { alert("Төлемді өшіру мүмкін емес"); return; }
-            await fetch(`${API_URL}/expenses/${id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
+            const endpoint = type === 'expense' ? `/expenses/${id}` : null;
+            if(!endpoint) { alert("Төлемді өшіру мүмкін емес"); return; }
+            await fetch(`${API_URL}${endpoint}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
             loadData();
         }
 
@@ -462,7 +457,7 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: 'white' } } } }
             });
         }
-        function drawBarChart(expenses, incomes) {
+        function drawBarChartFromData(data) {
             const ctx = document.getElementById('barChart');
             if (barInstance) barInstance.destroy();
             const labels = [], incData = new Array(7).fill(0), expData = new Array(7).fill(0);
@@ -470,8 +465,11 @@
                 const d = new Date(); d.setDate(d.getDate() - i);
                 const dStr = d.toISOString().split('T')[0];
                 labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-                expenses.forEach(item => { if(item.date.startsWith(dStr)) expData[6-i] += item.amount; });
-                incomes.forEach(item => { if(item.date.startsWith(dStr)) incData[6-i] += item.amount; });
+                data.forEach(item => {
+                    if(item.date && item.date.startsWith(dStr)) {
+                        if(item.type === 'expense') expData[6-i] += item.amount; else incData[6-i] += item.amount;
+                    }
+                });
             }
             barInstance = new Chart(ctx, {
                 type: 'bar',
