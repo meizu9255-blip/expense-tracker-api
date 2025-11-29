@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qarjy Pro - Final</title>
+    <title>Qarjy Baqylau Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -26,9 +26,9 @@
         .delay-3 { animation-delay: 0.3s; }
         .delay-4 { animation-delay: 0.4s; }
 
-        /* --- 2. ДИЗАЙН (Dark Blue Theme) --- */
+        /* --- 2. ДИЗАЙН (Premium Dark) --- */
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
             color: #ffffff;
             font-family: 'Segoe UI', sans-serif;
             min-height: 100vh;
@@ -62,12 +62,7 @@
             border-color: #3b82f6;
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
         }
-        /* Автотолтыру түсін түзеу */
-        input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
-            -webkit-box-shadow: 0 0 0 30px #1f2937 inset !important;
-            -webkit-text-fill-color: white !important;
-        }
-
+        
         /* Карточкалар */
         .stat-card {
             background: #1e293b;
@@ -89,6 +84,7 @@
         }
         .btn-add:hover { box-shadow: 0 0 20px rgba(37, 99, 235, 0.5); transform: translateY(-2px); }
 
+        /* Ауыстырғыш (Toggle) */
         .type-toggle { display: flex; background: #1f2937; padding: 4px; border-radius: 12px; margin-bottom: 20px; }
         .toggle-btn { flex: 1; padding: 10px; border: none; background: transparent; color: #9ca3af; font-weight: 600; border-radius: 10px; transition: 0.3s; }
         .toggle-btn.active-expense { background: #ef4444; color: white; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); }
@@ -98,7 +94,7 @@
         .nav-container { display: flex; justify-content: center; margin-bottom: 20px; }
         .nav-toggle { background: #111827; border: 1px solid #334155; border-radius: 50px; padding: 5px; display: flex; width: 100%; max-width: 400px; }
         .tab-btn { flex: 1; border: none; background: transparent; color: #9ca3af; padding: 10px; border-radius: 40px; font-weight: 600; transition: 0.3s; }
-        .tab-btn.active { background: #3b82f6; color: white; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+        .tab-btn.active { background: #2563eb; color: white; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
 
         /* Login Overlay */
         .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 23, 0.95); z-index: 9999; display: flex; align-items: center; justify-content: center; }
@@ -126,7 +122,7 @@
                 <input type="text" id="reg-username" class="form-control mb-3" placeholder="Атыңыз (Username)">
             </div>
             
-            <input type="email" id="auth-email" class="form-control mb-3" placeholder="Email (admin@test.kz)" value="admin@test.kz">
+            <input type="email" id="auth-email" class="form-control mb-3" placeholder="admin@test.kz" value="admin@test.kz">
             <input type="password" id="auth-password" class="form-control mb-4" placeholder="••••••" value="123">
             
             <button onclick="handleAuth()" class="btn-add mb-3" id="auth-btn">Кіру</button>
@@ -144,8 +140,8 @@
             <div class="d-flex align-items-center gap-3">
                 <div class="logo-circle" style="width: 40px; height: 40px; font-size: 1.2rem;"><i class="fas fa-chart-pie"></i></div>
                 <div>
-                    <h5 class="fw-bold m-0">Төлемдер мен Шығындар</h5>
-                    <small class="text-secondary-subtle" style="font-size: 0.8rem;">Қаржылық бақылау жүйесі</small>
+                    <h5 class="fw-bold m-0">Төлемдер мен Шығындарды Бақылау</h5>
+                    <small class="text-secondary-subtle" style="font-size: 0.8rem;">Кірістер мен шығындарды бір жерде бақылаңыз</small>
                 </div>
             </div>
             <div class="d-flex align-items-center gap-3">
@@ -162,7 +158,7 @@
         <div class="row g-4">
             <div class="col-lg-4">
                 <div class="form-panel animate-up delay-1 h-100">
-                    <h5 class="mb-4"><i class="fas fa-plus-circle me-2 text-primary"></i>Жаңа жазба</h5>
+                    <h5 class="mb-4"><i class="fas fa-plus-circle me-2 text-primary"></i>Транзакция қосу</h5>
                     <div class="type-toggle">
                         <button id="btn-expense" class="toggle-btn active-expense" onclick="setType('expense')">
                             <i class="fas fa-arrow-circle-down me-2"></i> Шығын
@@ -204,7 +200,7 @@
                         <div class="col-md-4"><div class="stat-card card-blue"><small class="text-secondary">Баланс</small><h3 id="net-balance" class="mb-0 fw-bold">0 ₸</h3></div></div>
                     </div>
                     <div class="custom-panel p-4 mb-4">
-                        <h5 class="mb-4">Соңғы 7 күн</h5>
+                        <h5 class="mb-4">Жалпы статистика (Төлем vs Шығыс)</h5>
                         <div style="height: 250px;"><canvas id="barChart"></canvas></div>
                     </div>
                     <div class="custom-panel p-4">
@@ -229,7 +225,12 @@
     </div>
 
     <script>
+        // --- СІЛТЕМЕ ---
+        // ЕГЕР КОМПЬЮТЕРДЕ ІСТЕТСЕҢІЗ:
         const API_URL = "https://expense-tracker-api-iy65.onrender.com";
+        // ЕГЕР NETLIFY-ҒА САЛСАҢЫЗ, МЫНАНЫ ҚОЙЫҢЫЗ:
+        // 
+        
         let token = localStorage.getItem("access_token");
         let currentType = 'expense';
         let isLoginMode = true;
@@ -386,7 +387,8 @@
             if(res.ok) {
                 const btn = document.querySelector('.btn-add');
                 btn.innerHTML = '<i class="fas fa-check"></i> Қосылды!';
-                setTimeout(() => { btn.innerHTML = 'Қосу'; }, 1500);
+                btn.style.background = '#10b981';
+                setTimeout(() => { btn.innerHTML = 'Қосу'; btn.style.background = ''; }, 1500);
                 
                 document.getElementById("amount").value = "";
                 document.getElementById("desc").value = "";
@@ -416,7 +418,7 @@
 
             data.forEach((item, index) => {
                 const isExp = item.type === 'expense';
-                const dateStr = new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const dateStr = new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 const catName = isExp ? (catNames[item.category_id] || "Басқа") : (item.description || "Төлем");
                 const delay = index * 0.05; 
                 
