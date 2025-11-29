@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qarjy Pro - Final</title>
+    <title>Qarjy Pro - Premium</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,7 +11,7 @@
     <style>
         /* --- 1. АНИМАЦИЯ (Smooth Slide Up) --- */
         @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
+            from { transform: translateY(40px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
         
@@ -20,7 +20,7 @@
             opacity: 0; 
         }
         
-        /* Кезекпен шығу (Stagger Effect) */
+        /* Кезекпен шығу (Stagger) */
         .delay-1 { animation-delay: 0.1s; }
         .delay-2 { animation-delay: 0.2s; }
         .delay-3 { animation-delay: 0.3s; }
@@ -101,7 +101,7 @@
         .tab-btn.active { background: #3b82f6; color: white; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
 
         /* Login Overlay */
-        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 23, 0.95); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #020617; z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .logo-circle { width: 50px; height: 50px; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: white; box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
 
         /* Тізім элементі */
@@ -140,12 +140,12 @@
 
     <div id="app-screen" class="container-fluid px-4" style="display: none; max-width: 1400px;">
         
-        <div class="header-bar animate-up" style="padding: 15px 25px;">
+        <div class="header-bar animate-up" style="padding: 15px 25px; display: flex; justify-content: space-between; align-items: center;">
             <div class="d-flex align-items-center gap-3">
                 <div class="logo-circle" style="width: 40px; height: 40px; font-size: 1.2rem;"><i class="fas fa-chart-pie"></i></div>
                 <div>
-                    <h5 class="fw-bold m-0">Төлемдер мен Шығындарды Бақылау</h5>
-                    <small class="text-secondary-subtle" style="font-size: 0.8rem;">Кірістер мен шығындарды бір жерде бақылаңыз</small>
+                    <h5 class="fw-bold m-0">Төлемдер мен Шығындар</h5>
+                    <small class="text-secondary-subtle" style="font-size: 0.8rem;">Қаржылық бақылау жүйесі</small>
                 </div>
             </div>
             <div class="d-flex align-items-center gap-3">
@@ -229,7 +229,7 @@
     </div>
 
     <script>
-        const API_URL = "https://expense-tracker-api-iy65.onrender.com"; // RENDER СЕРВЕРІ
+        const API_URL = "https://expense-tracker-api-iy65.onrender.com";
         let token = localStorage.getItem("access_token");
         let currentType = 'expense';
         let isLoginMode = true;
@@ -278,7 +278,7 @@
                 const fd = new FormData(); fd.append("username", email); fd.append("password", password);
                 try {
                     const res = await fetch(`${API_URL}/token`, { method: "POST", body: fd });
-                    if (!res.ok) throw new Error("Логин немесе пароль қате");
+                    if (!res.ok) throw new Error();
                     const data = await res.json();
                     localStorage.setItem("access_token", data.access_token);
                     token = data.access_token;
@@ -377,15 +377,11 @@
             });
 
             if(res.ok) {
-                // Toast хабарлама
-                const btn = document.querySelector('.btn-add');
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> Қосылды!';
-                btn.style.background = '#10b981';
-                setTimeout(() => { btn.innerHTML = originalText; btn.style.background = ''; }, 1500);
-                
                 document.getElementById("amount").value = "";
                 document.getElementById("desc").value = "";
+                const btn = document.querySelector('.btn-add');
+                btn.innerHTML = '<i class="fas fa-check"></i> Қосылды!';
+                setTimeout(() => { btn.innerText = 'Қосу'; }, 1500);
                 loadData();
             } else {
                 const err = await res.json();
@@ -412,7 +408,7 @@
 
             data.forEach((item, index) => {
                 const isExp = item.type === 'expense';
-                const dateStr = new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const dateStr = new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 const catName = isExp ? (catNames[item.category_id] || "Басқа") : (item.description || "Төлем");
                 const delay = index * 0.05; 
                 
@@ -438,8 +434,7 @@
 
         async function deleteItem(id, type) {
             if(!confirm("Өшіруге сенімдісіз бе?")) return;
-            const endpoint = type === 'expense' ? `/expenses/${id}` : null;
-            if(!endpoint) { alert("Төлемді өшіру мүмкін емес"); return; }
+            if(type === 'income') { alert("Төлемді өшіру мүмкін емес"); return; }
             await fetch(`${API_URL}${endpoint}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
             loadData();
         }
