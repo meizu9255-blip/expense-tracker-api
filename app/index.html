@@ -3,226 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qarjy Pro - Premium</title>
+    <title>Qarjy Pro - FINAL</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- 1. АНИМАЦИЯ (Smooth Slide Up) --- */
-        @keyframes slideUp {
-            from { transform: translateY(40px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .animate-up { 
-            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; 
-            opacity: 0; 
-        }
-        
-        /* Кезекпен шығу (Stagger) */
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
-        .delay-4 { animation-delay: 0.4s; }
-
-        /* --- 2. ДИЗАЙН (Figma Dark Theme) --- */
-        body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-            color: #ffffff;
-            font-family: 'Segoe UI', sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* Панельдер (Glassmorphism) */
-        .form-panel, .custom-panel, .header-bar, .form-auth {
-            background: #111827;
-            border: 1px solid #1f2937;
-            border-radius: 24px;
-            padding: 25px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            transition: transform 0.3s ease;
-        }
-        
-        .form-panel:hover, .custom-panel:hover {
-            transform: translateY(-4px);
-            border-color: #374151;
-        }
-
-        /* Input өрістері */
-        .form-control, .form-select {
-            background-color: #1f2937 !important;
-            border: 1px solid #374151;
-            color: white !important;
-            border-radius: 12px; padding: 12px;
-            transition: 0.3s;
-        }
-        .form-control:focus, .form-select:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-        }
-        /* Автотолтыру түсін түзеу */
-        input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
-            -webkit-box-shadow: 0 0 0 30px #1f2937 inset !important;
-            -webkit-text-fill-color: white !important;
-        }
-
-        /* Карточкалар */
-        .stat-card {
-            background: #1e293b;
-            border-radius: 16px; padding: 20px; 
-            height: 100%; border: 1px solid #334155;
-            transition: transform 0.3s; position: relative; overflow: hidden;
-        }
-        .stat-card:hover { transform: scale(1.03); background: #334155; z-index: 10; }
-        
-        .card-green { border-bottom: 4px solid #10b981; }
-        .card-red { border-bottom: 4px solid #ef4444; }
-        .card-blue { border-bottom: 4px solid #3b82f6; }
-
-        /* Батырмалар */
-        .btn-add {
-            background: linear-gradient(90deg, #2563eb, #3b82f6); 
-            color: white; width: 100%; padding: 12px;
-            border-radius: 12px; font-weight: bold; border: none; transition: 0.3s;
-        }
-        .btn-add:hover { box-shadow: 0 0 20px rgba(37, 99, 235, 0.5); transform: translateY(-2px); }
-
-        .type-toggle { display: flex; background: #1f2937; padding: 4px; border-radius: 12px; margin-bottom: 20px; }
-        .toggle-btn { flex: 1; padding: 10px; border: none; background: transparent; color: #9ca3af; font-weight: 600; border-radius: 10px; transition: 0.3s; }
-        .toggle-btn.active-expense { background: #ef4444; color: white; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); }
-        .toggle-btn.active-income { background: #10b981; color: white; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
-
-        /* Nav Tabs */
-        .nav-container { display: flex; justify-content: center; margin-bottom: 20px; }
-        .nav-toggle { background: #111827; border: 1px solid #334155; border-radius: 50px; padding: 5px; display: flex; width: 100%; max-width: 400px; }
-        .tab-btn { flex: 1; border: none; background: transparent; color: #9ca3af; padding: 10px; border-radius: 40px; font-weight: 600; transition: 0.3s; }
-        .tab-btn.active { background: #3b82f6; color: white; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
-
-        /* Login Overlay */
-        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #020617; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .logo-circle { width: 50px; height: 50px; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: white; box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
-
-        /* Тізім элементі */
-        .tx-item { background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; opacity: 0; animation: slideUp 0.5s ease-out forwards; }
-        .tx-item:hover { background: #334155; border-color: #64748b; transform: translateX(5px); }
-        .tx-icon { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-right: 15px; }
-        .icon-exp { background: rgba(239, 68, 68, 0.15); color: #ef4444; } .icon-inc { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-        .tx-cat { color: #93c5fd; font-weight: 600; background: rgba(59, 130, 246, 0.1); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; }
-        .tx-date { color: #94a3b8; font-size: 0.85rem; margin-left: 10px; } .tx-amt { font-weight: bold; font-size: 1.1rem; margin-right: 15px; }
-        .text-red { color: #ef4444; } .text-green { color: #10b981; }
-        .btn-del { background: transparent; border: none; color: #64748b; } .btn-del:hover { color: #ef4444; }
+        body { background: linear-gradient(135deg, #0f172a 0%, #172554 100%); color: #ffffff; font-family: sans-serif; min-height: 100vh; }
+        .custom-panel, .stat-card { background: #111827; border: 1px solid #1f2937; border-radius: 20px; padding: 24px; }
+        .form-control, .form-select { background-color: #1f2937 !important; border: 1px solid #374151; color: white !important; border-radius: 10px; padding: 12px; }
+        .btn-add { background: #2563eb; color: white; width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; margin-top: 10px; }
+        .type-toggle { display: flex; gap: 10px; margin-bottom: 20px; }
+        .type-btn { flex: 1; padding: 10px; border-radius: 8px; background: #1f2937; color: #9ca3af; border: none; }
+        .active-expense { background: #ef4444; color: white; }
+        .active-income { background: #10b981; color: white; }
+        .stat-card h3 { font-weight: bold; margin-top: 10px; }
+        .text-green { color: #10b981; } .text-red { color: #ef4444; } .text-blue { color: #3b82f6; }
+        .tx-item { background: #1e293b; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #374151; }
+        #login-section { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #020617; z-index: 9999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-    <div id="auth-screen" class="login-overlay">
-        <div class="form-auth animate-up text-center" style="width: 400px;">
-            <div class="d-flex justify-content-center mb-4"><div class="logo-circle"><i class="fas fa-wallet"></i></div></div>
-            <h3 class="fw-bold mb-4" id="auth-title">Жүйеге кіру</h3>
-            
-            <div id="register-fields" style="display: none;">
-                <input type="text" id="reg-username" class="form-control mb-3" placeholder="Атыңыз (Username)">
+    <div id="login-section">
+        <div class="custom-panel text-center" style="width: 400px;">
+            <h3 class="mb-4">Жүйеге кіру</h3>
+            <input type="email" id="email" class="form-control mb-3" placeholder="Email" value="admin@test.kz">
+            <input type="password" id="password" class="form-control mb-4" placeholder="Пароль" value="123">
+            <button onclick="login()" class="btn-add">Кіру</button>
+            <p onclick="document.getElementById('reg-part').style.display='block'" style="cursor:pointer; margin-top:10px; color:#9ca3af;">Тіркелу</p>
+            <div id="reg-part" style="display:none;">
+                <input type="text" id="reg-name" class="form-control mb-2" placeholder="Атыңыз">
+                <button onclick="register()" class="btn btn-outline-light w-100">Тіркелу</button>
             </div>
-            
-            <input type="email" id="auth-email" class="form-control mb-3" placeholder="Email (admin@test.kz)" value="admin@test.kz">
-            <input type="password" id="auth-password" class="form-control mb-4" placeholder="••••••" value="123">
-            
-            <button onclick="handleAuth()" class="btn-add mb-3" id="auth-btn">Кіру</button>
-            
-            <p class="text-secondary small" style="cursor: pointer;" onclick="toggleAuthMode()">
-                <span id="auth-switch-text">Аккаунтыңыз жоқ па? Тіркелу</span>
-            </p>
-            <p id="error-msg" class="text-danger mt-2 small fw-bold" style="display:none;"></p>
         </div>
     </div>
 
-    <div id="app-screen" class="container-fluid px-4" style="display: none; max-width: 1400px;">
-        
-        <div class="header-bar animate-up" style="padding: 15px 25px; display: flex; justify-content: space-between; align-items: center;">
-            <div class="d-flex align-items-center gap-3">
-                <div class="logo-circle" style="width: 40px; height: 40px; font-size: 1.2rem;"><i class="fas fa-chart-pie"></i></div>
-                <div>
-                    <h5 class="fw-bold m-0">Төлемдер мен Шығындар</h5>
-                    <small class="text-secondary-subtle" style="font-size: 0.8rem;">Қаржылық бақылау жүйесі</small>
-                </div>
-            </div>
-            <div class="d-flex align-items-center gap-3">
-                <div class="text-end d-none d-md-block">
-                    <div class="fw-bold small" id="user-name">User</div>
-                    <div class="small text-secondary" id="user-email">...</div>
-                </div>
-                <button onclick="logout()" class="btn btn-outline-danger btn-sm rounded-pill px-3" style="border-width: 1px;">
-                    <i class="fas fa-sign-out-alt me-2"></i> Шығу
-                </button>
-            </div>
+    <div id="app-section" class="container-fluid p-4" style="display: none;">
+        <div class="d-flex justify-content-between mb-4">
+            <h4>💰 Қаржы Бақылау</h4>
+            <button onclick="logout()" class="btn btn-sm btn-danger">Шығу</button>
         </div>
 
         <div class="row g-4">
             <div class="col-lg-4">
-                <div class="form-panel animate-up delay-1 h-100">
-                    <h5 class="mb-4"><i class="fas fa-plus-circle me-2 text-primary"></i>Жаңа жазба</h5>
+                <div class="custom-panel">
+                    <h5 class="mb-4">Транзакция қосу</h5>
                     <div class="type-toggle">
-                        <button id="btn-expense" class="toggle-btn active-expense" onclick="setType('expense')">
-                            <i class="fas fa-arrow-circle-down me-2"></i> Шығын
-                        </button>
-                        <button id="btn-income" class="toggle-btn" onclick="setType('income')">
-                            <i class="fas fa-arrow-circle-up me-2"></i> Төлем
-                        </button>
+                        <button id="btn-expense" class="type-btn active-expense" onclick="setType('expense')">Шығын</button>
+                        <button id="btn-income" class="type-btn" onclick="setType('income')">Төлем</button>
                     </div>
-                    <label class="small text-secondary mb-1">Сома (₸)</label>
-                    <input type="number" id="amount" class="form-control mb-3" placeholder="0">
+                    <input type="number" id="amount" class="form-control mb-3" placeholder="Сома">
                     <div id="cat-wrapper">
-                        <label class="small text-secondary mb-1">Санат</label>
                         <select id="cat-id" class="form-select mb-3">
-                            <option value="1">🍔 Тамақ</option><option value="2">🚌 Көлік</option><option value="3">🛍️ Сатып алу</option>
-                            <option value="4">🎮 Ойын-сауық</option><option value="5">💡 Коммуналдық</option><option value="6">💊 Денсаулық</option>
-                            <option value="7">🎓 Білім</option><option value="8">✈️ Саяхат</option><option value="9">📦 Басқа</option>
+                            <option value="1">🍔 Тамақ</option><option value="2">🚌 Көлік</option>
+                            <option value="3">🛍️ Сатып алу</option><option value="5">💡 Коммуналдық</option>
+                            <option value="6">💊 Денсаулық</option><option value="9">📦 Басқа</option>
                         </select>
                     </div>
-                    <label class="small text-secondary mb-1">Күні</label>
                     <input type="date" id="date" class="form-control mb-3">
-                    <label class="small text-secondary mb-1">Сипаттама</label>
-                    <textarea id="desc" class="form-control mb-4" rows="3" placeholder="Сипаттама..."></textarea>
+                    <input type="text" id="desc" class="form-control mb-3" placeholder="Сипаттама">
                     <button onclick="addTransaction()" class="btn-add">Қосу</button>
                 </div>
             </div>
 
             <div class="col-lg-8">
-                <div class="nav-container animate-up delay-2">
-                    <div class="nav-toggle">
-                        <button class="tab-btn active" onclick="switchTab('dashboard')" id="tab-dashboard">Шолу</button>
-                        <button class="tab-btn" onclick="switchTab('transactions')" id="tab-transactions">Транзакциялар</button>
-                    </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4"><div class="stat-card"><small>Кіріс</small><h3 id="inc-val" class="text-green">0 ₸</h3></div></div>
+                    <div class="col-md-4"><div class="stat-card"><small>Шығыс</small><h3 id="exp-val" class="text-red">0 ₸</h3></div></div>
+                    <div class="col-md-4"><div class="stat-card"><small>Баланс</small><h3 id="net-val" class="text-blue">0 ₸</h3></div></div>
                 </div>
 
-                <div id="view-dashboard" class="animate-up delay-3">
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-4"><div class="stat-card card-green"><small class="text-secondary">Төлемдер</small><h3 id="total-income" class="mb-0 fw-bold">0 ₸</h3></div></div>
-                        <div class="col-md-4"><div class="stat-card card-red"><small class="text-secondary">Шығындар</small><h3 id="total-expenses" class="mb-0 fw-bold">0 ₸</h3></div></div>
-                        <div class="col-md-4"><div class="stat-card card-blue"><small class="text-secondary">Баланс</small><h3 id="net-balance" class="mb-0 fw-bold">0 ₸</h3></div></div>
-                    </div>
-                    <div class="custom-panel p-4 mb-4">
-                        <h5 class="mb-4">Соңғы 7 күн</h5>
-                        <div style="height: 250px;"><canvas id="barChart"></canvas></div>
-                    </div>
-                    <div class="custom-panel p-4">
-                        <h5 class="mb-3">Санаттар бойынша</h5>
-                        <div style="height: 250px; display: flex; justify-content: center;"><canvas id="doughnutChart"></canvas></div>
-                    </div>
+                <div class="custom-panel mb-4">
+                    <h5>График (Төлем vs Шығыс)</h5>
+                    <div style="height: 250px;"><canvas id="barChart"></canvas></div>
                 </div>
 
-                <div id="view-transactions" style="display: none;" class="animate-up delay-3">
-                    <div class="row mb-3">
-                        <div class="col-md-8"><input type="text" id="search-input" class="form-control" placeholder="🔍 Іздеу..." oninput="filterData()"></div>
-                        <div class="col-md-4">
-                            <select id="filter-type" class="form-select" onchange="filterData()">
-                                <option value="all">Барлығы</option><option value="income">Төлемдер</option><option value="expense">Шығындар</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div id="transaction-list"></div>
+                <div class="custom-panel">
+                    <h5>Транзакциялар тарихы</h5>
+                    <div id="tx-list" class="mt-3"></div>
                 </div>
             </div>
         </div>
@@ -230,145 +89,88 @@
 
     <script>
         const API_URL = "https://expense-tracker-api-iy65.onrender.com";
-        let token = localStorage.getItem("access_token");
+        let token = localStorage.getItem("token");
         let currentType = 'expense';
-        let isLoginMode = true;
-        let allTransactions = [];
-        const catNames = { 1: "Тамақ", 2: "Көлік", 3: "Сатып алу", 4: "Ойын-сауық", 5: "Коммуналдық", 6: "Денсаулық", 7: "Білім", 8: "Саяхат", 9: "Басқа" };
 
         document.getElementById('date').valueAsDate = new Date();
-        if (token) showApp();
+        if(token) showApp();
 
-        function switchTab(tab) {
-            document.getElementById('view-dashboard').style.display = tab === 'dashboard' ? 'block' : 'none';
-            document.getElementById('view-transactions').style.display = tab === 'transactions' ? 'block' : 'none';
-            document.getElementById('tab-dashboard').className = tab === 'dashboard' ? 'tab-btn active' : 'tab-btn';
-            document.getElementById('tab-transactions').className = tab === 'transactions' ? 'tab-btn active' : 'tab-btn';
+        function setType(t) {
+            currentType = t;
+            document.getElementById('btn-expense').className = t==='expense' ? 'type-btn active-expense' : 'type-btn';
+            document.getElementById('btn-income').className = t==='income' ? 'type-btn active-income' : 'type-btn';
+            document.getElementById('cat-wrapper').style.display = t==='expense' ? 'block' : 'none';
         }
 
-        function setType(type) {
-            currentType = type;
-            const btnExp = document.getElementById('btn-expense');
-            const btnInc = document.getElementById('btn-income');
-            if (type === 'expense') {
-                btnExp.className = 'toggle-btn active-expense'; btnInc.className = 'toggle-btn';
-                document.getElementById('cat-wrapper').style.display = 'block';
-            } else {
-                btnInc.className = 'toggle-btn active-income'; btnExp.className = 'toggle-btn';
-                document.getElementById('cat-wrapper').style.display = 'none';
-            }
+        async function login() {
+            const fd = new FormData();
+            fd.append("username", document.getElementById('email').value);
+            fd.append("password", document.getElementById('password').value);
+            try {
+                const res = await fetch(`${API_URL}/token`, { method: "POST", body: fd });
+                if(!res.ok) throw new Error();
+                const data = await res.json();
+                localStorage.setItem("token", data.access_token);
+                token = data.access_token;
+                showApp();
+            } catch { alert("Логин қате! Немесе тіркеліңіз."); }
         }
 
-        function toggleAuthMode() {
-            isLoginMode = !isLoginMode;
-            document.getElementById("auth-title").innerText = isLoginMode ? "Жүйеге кіру" : "Тіркелу";
-            document.getElementById("auth-btn").innerText = isLoginMode ? "Кіру" : "Тіркелу";
-            document.getElementById("auth-switch-text").innerText = isLoginMode ? "Аккаунтыңыз жоқ па? Тіркелу" : "Аккаунтыңыз бар ма? Кіру";
-            document.getElementById("register-fields").style.display = isLoginMode ? "none" : "block";
-            document.getElementById("error-msg").style.display = "none";
+        async function register() {
+            const u = document.getElementById('reg-name').value;
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('password').value;
+            await fetch(`${API_URL}/users/`, { 
+                method: "POST", 
+                headers: {"Content-Type":"application/json"}, 
+                body: JSON.stringify({username:u, email:e, password:p}) 
+            });
+            alert("Тіркелді! Енді КІРУ басыңыз.");
         }
 
-        async function handleAuth() {
-            const email = document.getElementById("auth-email").value;
-            const password = document.getElementById("auth-password").value;
-            const btn = document.getElementById("auth-btn");
-            btn.innerText = "Күте тұрыңыз...";
-            
-            if (isLoginMode) { // LOGIN
-                const fd = new FormData(); fd.append("username", email); fd.append("password", password);
-                try {
-                    const res = await fetch(`${API_URL}/token`, { method: "POST", body: fd });
-                    if (!res.ok) throw new Error();
-                    const data = await res.json();
-                    localStorage.setItem("access_token", data.access_token);
-                    token = data.access_token;
-                    showApp();
-                } catch { 
-                    document.getElementById("error-msg").innerText = "Қате деректер! (Сервер Render-де болса, 1 мин күтіңіз)"; 
-                    document.getElementById("error-msg").style.display = "block"; 
-                    btn.innerText = "Кіру";
-                }
-            } else { // REGISTER
-                const username = document.getElementById("reg-username").value;
-                if (!username) { alert("Атыңызды жазыңыз!"); btn.innerText = "Тіркелу"; return; }
-                try {
-                    const res = await fetch(`${API_URL}/users/`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, email, password }) });
-                    if (res.ok) { 
-                        alert("Сәтті тіркелдіңіз! Енді кіріңіз."); 
-                        toggleAuthMode(); 
-                        document.getElementById("auth-password").value = ""; 
-                    } else { 
-                        const err = await res.json();
-                        alert("Тіркелу қатесі: " + (err.detail || "Белгісіз қате")); 
-                    }
-                    btn.innerText = "Тіркелу";
-                } catch (e) { console.error(e); btn.innerText = "Тіркелу"; alert("Сервер қатесі!"); }
-            }
-        }
-
-        function logout() { localStorage.removeItem("access_token"); location.reload(); }
-        
+        function logout() { localStorage.removeItem("token"); location.reload(); }
         function showApp() { 
-            const authScreen = document.getElementById("auth-screen");
-            authScreen.style.transition = "opacity 0.5s ease";
-            authScreen.style.opacity = "0";
-            setTimeout(() => {
-                authScreen.style.display = "none"; 
-                document.getElementById("app-screen").style.display = "block"; 
-                loadData(); loadUserProfile(); 
-            }, 500);
-        }
-
-        async function loadUserProfile() {
-            try { const res = await fetch(`${API_URL}/users/me/`, { headers: { "Authorization": `Bearer ${token}` } }); const user = await res.json(); document.getElementById("user-name").innerText = user.username; document.getElementById("user-email").innerText = user.email; } catch(e){}
+            document.getElementById('login-section').style.display='none'; 
+            document.getElementById('app-section').style.display='block'; 
+            loadData(); 
         }
 
         async function loadData() {
-            const animateValue = (id, start, end, duration) => {
-                const obj = document.getElementById(id);
-                let startTimestamp = null;
-                const step = (timestamp) => {
-                    if (!startTimestamp) startTimestamp = timestamp;
-                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                    obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString() + " ₸";
-                    if (progress < 1) window.requestAnimationFrame(step);
-                };
-                window.requestAnimationFrame(step);
-            };
+            try {
+                const headers = { "Authorization": `Bearer ${token}` };
+                // Баланс
+                const balRes = await fetch(`${API_URL}/balance/`, { headers });
+                const bal = await balRes.json();
+                document.getElementById('inc-val').innerText = bal.total_income + " ₸";
+                document.getElementById('exp-val').innerText = bal.total_expenses + " ₸";
+                document.getElementById('net-val').innerText = bal.net_balance + " ₸";
 
-            const resBal = await fetch(`${API_URL}/balance/`, { headers: { "Authorization": `Bearer ${token}` } });
-            const bal = await resBal.json();
-            animateValue("total-income", 0, bal.total_income, 1000);
-            animateValue("total-expenses", 0, bal.total_expenses, 1000);
-            animateValue("net-balance", 0, bal.net_balance, 1000);
+                // Тізім және График
+                const [expRes, incRes] = await Promise.all([
+                    fetch(`${API_URL}/expenses/`, { headers }),
+                    fetch(`${API_URL}/incomes/`, { headers })
+                ]);
+                const exp = await expRes.json();
+                const inc = await incRes.json();
+                
+                const all = [...exp.map(x=>({...x, type:'exp'})), ...inc.map(x=>({...x, type:'inc'}))];
+                all.sort((a,b) => new Date(b.date) - new Date(a.date));
 
-            const [resExp, resInc] = await Promise.all([
-                fetch(`${API_URL}/expenses/`, { headers: { "Authorization": `Bearer ${token}` } }),
-                fetch(`${API_URL}/incomes/`, { headers: { "Authorization": `Bearer ${token}` } })
-            ]);
-            const exp = resExp.ok ? await resExp.json() : [];
-            const inc = resInc.ok ? await resInc.json() : [];
-
-            allTransactions = [
-                ...exp.map(e => ({ ...e, type: 'expense' })),
-                ...inc.map(i => ({ ...i, type: 'income' }))
-            ].sort((a,b) => new Date(b.date) - new Date(a.date));
-
-            renderList(allTransactions);
-
-            const resStat = await fetch(`${API_URL}/statistics/expenses/`, { headers: { "Authorization": `Bearer ${token}` } });
-            const stats = resStat.ok ? await resStat.json() : [];
-            drawDoughnut(stats);
-            drawBarChartFromData(allTransactions);
+                renderList(all);
+                drawChart(bal.total_income, bal.total_expenses);
+            } catch(e) { console.error(e); }
         }
 
         async function addTransaction() {
-            const body = { 
-                amount: parseFloat(document.getElementById("amount").value),
-                description: document.getElementById("desc").value,
-                date: document.getElementById("date").value 
+            const amt = document.getElementById('amount').value;
+            if(!amt) return alert("Соманы жаз!");
+            
+            const body = {
+                amount: parseFloat(amt),
+                description: document.getElementById('desc').value,
+                date: document.getElementById('date').value
             };
-            if (currentType === 'expense') body.category_id = parseInt(document.getElementById("cat-id").value);
+            if(currentType === 'expense') body.category_id = parseInt(document.getElementById('cat-id').value);
 
             const res = await fetch(`${API_URL}/${currentType}s/`, {
                 method: "POST",
@@ -377,105 +179,47 @@
             });
 
             if(res.ok) {
-                document.getElementById("amount").value = "";
-                document.getElementById("desc").value = "";
-                const btn = document.querySelector('.btn-add');
-                btn.innerHTML = '<i class="fas fa-check"></i> Қосылды!';
-                setTimeout(() => { btn.innerText = 'Қосу'; }, 1500);
+                alert("Сәтті қосылды!");
                 loadData();
             } else {
                 const err = await res.json();
-                alert("Қате: " + (err.detail ? JSON.stringify(err.detail) : "Санат таңдалмады ма?"));
+                alert("Қате: " + JSON.stringify(err.detail));
             }
-        }
-
-        function filterData() {
-            const text = document.getElementById("search-input").value.toLowerCase();
-            const type = document.getElementById("filter-type").value;
-            const filtered = allTransactions.filter(item => {
-                const cat = (catNames[item.category_id] || item.description || "").toLowerCase();
-                const matchText = cat.includes(text);
-                const matchType = type === 'all' || item.type === type;
-                return matchText && matchType;
-            });
-            renderList(filtered);
         }
 
         function renderList(data) {
-            const list = document.getElementById("transaction-list");
+            const list = document.getElementById('tx-list');
             list.innerHTML = "";
-            if(data.length === 0) { list.innerHTML = '<div class="text-center text-secondary py-5">Деректер жоқ</div>'; return; }
-
-            data.forEach((item, index) => {
-                const isExp = item.type === 'expense';
-                const dateStr = new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                const catName = isExp ? (catNames[item.category_id] || "Басқа") : (item.description || "Төлем");
-                const delay = index * 0.05; 
-                
-                const html = `
-                    <div class="tx-item" style="animation-delay: ${delay}s">
-                        <div class="d-flex align-items-center">
-                            <div class="tx-icon ${isExp ? 'icon-exp' : 'icon-inc'}"><i class="fas ${isExp ? 'fa-arrow-down' : 'fa-arrow-up'}"></i></div>
-                            <div>
-                                <div class="tx-cat">${catName}</div>
-                                <div class="tx-date">${dateStr}</div>
+            data.forEach(i => {
+                list.innerHTML += `
+                    <div class="tx-item">
+                        <div>
+                            <div style="font-weight:bold; color:${i.type==='exp'?'#ef4444':'#10b981'}">
+                                ${i.type==='exp'?'Шығын':'Төлем'}
                             </div>
+                            <small style="color:#9ca3af">${i.description || '-'} | ${i.date.split('T')[0]}</small>
                         </div>
-                        <div class="d-flex align-items-center">
-                            <span class="tx-amt ${isExp ? 'text-red' : 'text-green'}">
-                                ${isExp ? '-' : '+'} ${item.amount.toLocaleString()} ₸
-                            </span>
-                            <button class="btn-del ms-2" onclick="deleteItem(${item.id}, '${item.type}')"><i class="fas fa-trash-alt"></i></button>
-                        </div>
-                    </div>`;
-                list.innerHTML += html;
+                        <div style="font-weight:bold; font-size:1.1rem;">${i.amount} ₸</div>
+                    </div>
+                `;
             });
         }
 
-        async function deleteItem(id, type) {
-            if(!confirm("Өшіруге сенімдісіз бе?")) return;
-            if(type === 'income') { alert("Төлемді өшіру мүмкін емес"); return; }
-            await fetch(`${API_URL}${endpoint}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
-            loadData();
-        }
-
-        let barInstance = null, doughnutInstance = null;
-        function drawDoughnut(data) {
-            const ctx = document.getElementById('doughnutChart');
-            if (doughnutInstance) doughnutInstance.destroy();
-            doughnutInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: data.map(i => i.category_name),
-                    datasets: [{ data: data.map(i => i.total_amount), backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'], borderWidth: 0 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: 'white' } } } }
-            });
-        }
-        function drawBarChartFromData(data) {
+        let myChart;
+        function drawChart(inc, exp) {
             const ctx = document.getElementById('barChart');
-            if (barInstance) barInstance.destroy();
-            const labels = [], incData = new Array(7).fill(0), expData = new Array(7).fill(0);
-            for(let i=6; i>=0; i--) {
-                const d = new Date(); d.setDate(d.getDate() - i);
-                const dStr = d.toISOString().split('T')[0];
-                labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-                data.forEach(item => {
-                    if(item.date && item.date.startsWith(dStr)) {
-                        if(item.type === 'expense') expData[6-i] += item.amount; else incData[6-i] += item.amount;
-                    }
-                });
-            }
-            barInstance = new Chart(ctx, {
+            if(myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'Төлем', data: incData, backgroundColor: '#10b981', borderRadius: 4 },
-                        { label: 'Шығын', data: expData, backgroundColor: '#ef4444', borderRadius: 4 }
-                    ]
+                    labels: ['Кіріс', 'Шығыс'],
+                    datasets: [{
+                        data: [inc, exp],
+                        backgroundColor: ['#10b981', '#ef4444'],
+                        borderRadius: 10
+                    }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: 'white' } } }, scales: { x: { ticks: { color: '#9ca3af' }, grid: {display:false} }, y: { ticks: { color: '#9ca3af' }, grid: { color: '#374151' } } } }
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
             });
         }
     </script>
