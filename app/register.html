@@ -3,114 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тіркелу - Qarjy Baqylau</title>
+    <title>Qarjy Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-            color: #ffffff;
-            font-family: 'Segoe UI', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* АНИМАЦИЯ */
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .animate-up { animation: slideUp 0.6s ease-out forwards; }
+        
+        /* ДИЗАЙН */
+        body { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: #fff; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
+        
+        /* ПАНЕЛЬДЕР */
+        .custom-panel, .stat-card {
+            background: #111827; border: 1px solid #1f2937; border-radius: 20px; padding: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
-        .custom-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            max-width: 400px;
-            width: 100%;
+        .form-control, .form-select {
+            background-color: #1f2937 !important; border: 1px solid #374151; color: white !important;
+            border-radius: 10px; padding: 12px;
         }
-        .form-control {
-            background-color: #1f2937 !important;
-            border: 1px solid #374151;
-            color: #ffffff !important;
-            border-radius: 10px;
-            padding: 12px;
+        .form-control:focus { border-color: #3b82f6; box-shadow: none; }
+
+        /* БАТЫРМАЛАР */
+        .btn-add {
+            background: #3b82f6; border: none; width: 100%; padding: 12px; border-radius: 10px;
+            font-weight: bold; transition: 0.3s; color: white;
         }
-        .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); }
-        .btn-submit {
-            background-color: #2563eb; color: white; width: 100%; padding: 12px;
-            border-radius: 10px; border: none; font-weight: bold; margin-top: 10px;
+        .btn-add:hover { background: #2563eb; transform: translateY(-2px); }
+        
+        /* TOGGLE */
+        .type-toggle { display: flex; gap: 10px; margin-bottom: 20px; background: #1f2937; padding: 5px; border-radius: 12px; }
+        .type-btn {
+            flex: 1; padding: 10px; border: none; border-radius: 8px; background: transparent;
+            color: #9ca3af; font-weight: bold; transition: 0.3s;
         }
-        .btn-submit:hover { background-color: #1d4ed8; }
-        .logo-box {
-            width: 50px; height: 50px;
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; color: white;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
-            margin: 0 auto 20px auto;
-        }
+        .active-expense { background: #ef4444; color: white; }
+        .active-income { background: #10b981; color: white; }
+
+        /* СТАТИСТИКА */
+        .card-green h3 { color: #10b981; } .card-red h3 { color: #ef4444; } .card-blue h3 { color: #3b82f6; }
+        
+        /* LOGIN */
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #020617; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        
+        /* ТІЗІМ */
+        .tx-item { background: #1f2937; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #374151; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="custom-panel p-5 text-center">
-            <div class="logo-box"><i class="fas fa-user-plus"></i></div>
-            <h3 class="fw-bold mb-4">Тіркелу</h3>
+
+    <div id="login-section" class="login-overlay">
+        <div class="custom-panel text-center animate-up" style="width: 400px;">
+            <div class="mb-4"><i class="fas fa-wallet fa-3x text-primary"></i></div>
+            <h3 class="fw-bold mb-4" id="auth-title">Жүйеге кіру</h3>
             
-            <div class="text-start mb-3">
-                <label class="small text-secondary mb-1">Аты-жөні (Логин)</label>
-                <input type="text" id="reg-username" class="form-control" placeholder="user123">
+            <div id="reg-name-div" style="display:none;">
+                <input type="text" id="reg-name" class="form-control mb-3" placeholder="Атыңыз">
             </div>
-
-            <div class="text-start mb-3">
-                <label class="small text-secondary mb-1">Email</label>
-                <input type="email" id="reg-email" class="form-control" placeholder="email@test.kz">
-            </div>
-
-            <div class="text-start mb-4">
-                <label class="small text-secondary mb-1">Пароль</label>
-                <input type="password" id="reg-password" class="form-control" placeholder="••••••">
-            </div>
-
-            <button onclick="register()" class="btn-submit">Тіркелу</button>
+            <input type="email" id="email" class="form-control mb-3" placeholder="Email" value="admin@test.kz">
+            <input type="password" id="password" class="form-control mb-4" placeholder="Пароль" value="123">
             
-            <div class="mt-4 text-center">
-                <small class="text-secondary">Аккаунтыңыз бар ма? <a href="index.html" class="text-primary text-decoration-none fw-bold">Кіру</a></small>
+            <button onclick="handleAuth()" class="btn-add mb-3" id="auth-btn">Кіру</button>
+            
+            <p class="small text-secondary" style="cursor:pointer" onclick="toggleAuth()">
+                <span id="auth-switch">Аккаунтыңыз жоқ па? Тіркелу</span>
+            </p>
+        </div>
+    </div>
+
+    <div id="dashboard-section" class="container-fluid p-4" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center mb-4 animate-up">
+            <div class="d-flex align-items-center gap-3">
+                <i class="fas fa-chart-pie fa-2x text-primary"></i>
+                <div>
+                    <h4 class="m-0 fw-bold">Төлемдер мен Шығындар</h4>
+                    <small class="text-secondary">Қаржылық бақылау</small>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-end d-none d-md-block">
+                    <div class="fw-bold" id="user-name">User</div>
+                    <div class="small text-secondary" id="user-email">...</div>
+                </div>
+                <button onclick="logout()" class="btn btn-outline-danger btn-sm">Шығу</button>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4 animate-up delay-1">
+                <div class="custom-panel h-100">
+                    <h5 class="mb-4">Транзакция қосу</h5>
+                    <div class="type-toggle">
+                        <button id="btn-expense" class="type-btn active-expense" onclick="setType('expense')">Шығын</button>
+                        <button id="btn-income" class="type-btn" onclick="setType('income')">Төлем</button>
+                    </div>
+                    
+                    <label class="small text-secondary mb-1">Сома</label>
+                    <input type="number" id="amount" class="form-control mb-3" placeholder="0">
+                    
+                    <div id="cat-wrapper">
+                        <label class="small text-secondary mb-1">Санат</label>
+                        <select id="cat-id" class="form-select mb-3">
+                            <option value="1">🍔 Тамақ</option>
+                            <option value="2">🚌 Көлік</option>
+                            <option value="3">🛍️ Сатып алу</option>
+                            <option value="5">💡 Коммуналдық</option>
+                            <option value="9">📦 Басқа</option>
+                        </select>
+                    </div>
+                    
+                    <label class="small text-secondary mb-1">Күні</label>
+                    <input type="date" id="date" class="form-control mb-3">
+                    
+                    <label class="small text-secondary mb-1">Сипаттама</label>
+                    <textarea id="desc" class="form-control mb-3" rows="2" placeholder="..."></textarea>
+                    
+                    <button onclick="addTransaction()" class="btn-add">Қосу</button>
+                </div>
+            </div>
+
+            <div class="col-lg-8 animate-up delay-2">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4"><div class="stat-card card-green"><small>Төлемдер</small><h3 id="inc-total">0 ₸</h3></div></div>
+                    <div class="col-md-4"><div class="stat-card card-red"><small>Шығындар</small><h3 id="exp-total">0 ₸</h3></div></div>
+                    <div class="col-md-4"><div class="stat-card card-blue"><small>Баланс</small><h3 id="net-total">0 ₸</h3></div></div>
+                </div>
+
+                <div class="custom-panel mb-4">
+                    <h5 class="mb-3">Статистика (Төлем vs Шығыс)</h5>
+                    <div style="height: 250px;"><canvas id="barChart"></canvas></div>
+                </div>
+                
+                <div class="custom-panel">
+                    <h5 class="mb-3">Соңғы транзакциялар</h5>
+                    <div id="tx-list" style="max-height: 200px; overflow-y: auto;"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        const API_URL = "http://127.0.0.1:8000";
+        const API_URL = "https://expense-tracker-api-iy65.onrender.com";
+        let token = localStorage.getItem("access_token");
+        let currentType = 'expense';
+        let isLogin = true;
 
-        async function register() {
-            const username = document.getElementById("reg-username").value;
-            const email = document.getElementById("reg-email").value;
-            const password = document.getElementById("reg-password").value;
+        document.getElementById('date').valueAsDate = new Date();
+        if (token) showDashboard();
 
-            if(!username || !email || !password) {
-                alert("Барлық өрістерді толтырыңыз!");
-                return;
+        function setType(t) {
+            currentType = t;
+            if(t==='expense') {
+                document.getElementById('btn-expense').className = 'type-btn active-expense';
+                document.getElementById('btn-income').className = 'type-btn';
+                document.getElementById('cat-wrapper').style.display = 'block';
+            } else {
+                document.getElementById('btn-income').className = 'type-btn active-income';
+                document.getElementById('btn-expense').className = 'type-btn';
+                document.getElementById('cat-wrapper').style.display = 'none';
             }
+        }
+
+        function toggleAuth() {
+            isLogin = !isLogin;
+            document.getElementById('auth-title').innerText = isLogin ? "Жүйеге кіру" : "Тіркелу";
+            document.getElementById('auth-btn').innerText = isLogin ? "Кіру" : "Тіркелу";
+            document.getElementById('auth-switch').innerText = isLogin ? "Аккаунтыңыз жоқ па? Тіркелу" : "Аккаунтыңыз бар ма? Кіру";
+            document.getElementById('reg-name-div').style.display = isLogin ? "none" : "block";
+        }
+
+        async function handleAuth() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const btn = document.getElementById("auth-btn");
+            btn.innerText = "Күте тұрыңыз...";
 
             try {
-                const response = await fetch(`${API_URL}/users/`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username, email, password })
-                });
-
-                if (response.ok) {
-                    alert("Сәтті тіркелдіңіз! Енді кіріңіз.");
-                    window.location.href = "index.html"; // Басты бетке қайту
+                if (isLogin) {
+                    const fd = new FormData(); fd.append("username", email); fd.append("password", password);
+                    const res = await fetch(`${API_URL}/token`, { method: "POST", body: fd });
+                    if (!res.ok) throw new Error();
+                    const data = await res.json();
+                    localStorage.setItem("access_token", data.access_token);
+                    token = data.access_token;
+                    showDashboard();
                 } else {
-                    const error = await response.json();
-                    let msg = error.detail;
-                    if (Array.isArray(error.detail)) msg = error.detail[0].msg;
-                    alert("Қате: " + msg);
+                    const username = document.getElementById("reg-name").value;
+                    const res = await fetch(`${API_URL}/users/`, { 
+                        method: "POST", headers: {"Content-Type":"application/json"}, 
+                        body: JSON.stringify({username, email, password}) 
+                    });
+                    if (res.ok) { alert("Тіркелді! Енді кіріңіз."); toggleAuth(); }
+                    else { alert("Тіркелу қатесі!"); }
                 }
-            } catch (e) {
-                console.error(e);
-                alert("Серверге қосылу қатесі!");
+            } catch { alert("Сервер қатесі! (Сервер оянып жатқан шығар)"); }
+            btn.innerText = isLogin ? "Кіру" : "Тіркелу";
+        }
+
+        function logout() { localStorage.removeItem("access_token"); location.reload(); }
+        function showDashboard() { 
+            document.getElementById('login-section').style.display='none'; 
+            document.getElementById('dashboard-section').style.display='block';
+            loadData();
+            fetch(`${API_URL}/users/me/`, { headers: {"Authorization": `Bearer ${token}`} })
+                .then(r => r.json()).then(u => {
+                    document.getElementById("user-name").innerText = u.username;
+                    document.getElementById("user-email").innerText = u.email;
+                });
+        }
+
+        async function loadData() {
+            const headers = { "Authorization": `Bearer ${token}` };
+            // Баланс
+            const resBal = await fetch(`${API_URL}/balance/`, { headers });
+            const bal = await resBal.json();
+            document.getElementById("inc-total").innerText = bal.total_income + " ₸";
+            document.getElementById("exp-total").innerText = bal.total_expenses + " ₸";
+            document.getElementById("net-total").innerText = bal.net_balance + " ₸";
+
+            // Тізім және График
+            const [r1, r2] = await Promise.all([
+                fetch(`${API_URL}/expenses/`, { headers }),
+                fetch(`${API_URL}/incomes/`, { headers })
+            ]);
+            const exp = await r1.json();
+            const inc = await r2.json();
+            
+            const all = [...exp.map(x=>({...x, type:'exp'})), ...inc.map(x=>({...x, type:'inc'}))];
+            all.sort((a,b) => new Date(b.date) - new Date(a.date));
+            
+            renderList(all);
+            drawChart(bal.total_income, bal.total_expenses);
+        }
+
+        async function addTransaction() {
+            const amt = document.getElementById("amount").value;
+            if(!amt) return alert("Соманы жазыңыз!");
+            
+            const body = {
+                amount: parseFloat(amt),
+                description: document.getElementById("desc").value,
+                date: document.getElementById("date").value
+            };
+            if(currentType === 'expense') body.category_id = parseInt(document.getElementById("cat-id").value);
+
+            const res = await fetch(`${API_URL}/${currentType}s/`, {
+                method: "POST",
+                headers: {"Authorization": `Bearer ${token}`, "Content-Type": "application/json"},
+                body: JSON.stringify(body)
+            });
+
+            if(res.ok) {
+                alert("Сәтті қосылды!");
+                document.getElementById("amount").value = "";
+                loadData();
+            } else {
+                const err = await res.json();
+                alert("Қате: " + JSON.stringify(err.detail));
             }
+        }
+
+        function renderList(data) {
+            const list = document.getElementById("tx-list");
+            list.innerHTML = "";
+            data.forEach(i => {
+                const isExp = i.type === 'exp';
+                list.innerHTML += `
+                    <div class="tx-item">
+                        <div>
+                            <strong class="${isExp?'text-red':'text-green'}">${isExp ? 'Шығын' : 'Төлем'}</strong>
+                            <small class="text-secondary d-block">${i.description || '-'} | ${i.date.split('T')[0]}</small>
+                        </div>
+                        <div class="fw-bold">${isExp?'-':'+'} ${i.amount} ₸</div>
+                    </div>`;
+            });
+        }
+
+        function drawChart(inc, exp) {
+            const ctx = document.getElementById('barChart');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Төлем', 'Шығыс'],
+                    datasets: [{
+                        data: [inc, exp],
+                        backgroundColor: ['#10b981', '#ef4444'],
+                        borderRadius: 10
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+            });
         }
     </script>
 </body>
