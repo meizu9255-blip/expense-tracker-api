@@ -1,15 +1,28 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import os
 
-# Render-дегі базаны автоматты түрде табады
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./sql_app.db")
+# -------------------------------------------------------------------
+# БАЗАҒА ҚОСЫЛУ (СЕРВЕРДІ АВТОМАТТЫ ТҮРДЕ ТАНУ)
+# -------------------------------------------------------------------
 
-# Render қатесін түзеу
-if SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
+# 1. Render-дегі "DATABASE_URL" құпия сөзін іздейміз
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
+
+# 2. Егер ол жоқ болса (яғни компьютердеміз), мынаны қолданамыз:
+if not SQLALCHEMY_DATABASE_URL:
+    # Егер сіз PostgreSQL қолдансаңыз:
+    # SQLALCHEMY_DATABASE_URL = "postgresql://postgres:1234@localhost/expense_db"
+    
+    # Егер сіз SQLite (оңай нұсқа) қолдансаңыз:
+    SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
+
+# 3. Render-дің ескі сілтемесін түзеу (postgres:// -> postgresql://)
+if SQLALCHEMY_DATABASE_URL and SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
     SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
+# 4. Қосылу параметрлері
 if "sqlite" in SQLALCHEMY_DATABASE_URL:
     engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 else:
