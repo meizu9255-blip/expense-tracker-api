@@ -378,33 +378,47 @@
         }
 
         async function addTransaction() {
-            const body = { 
-                amount: parseFloat(document.getElementById("amount").value),
-                description: document.getElementById("desc").value,
-                date: document.getElementById("date").value 
-            };
-            if (currentType === 'expense') body.category_id = parseInt(document.getElementById("cat-id").value);
+    const amount = document.getElementById("amount").value;
+    const dateVal = document.getElementById("date").value;
 
-            const res = await fetch(`${API_URL}/${currentType}s/`, {
-                method: "POST",
-                headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
-                body: JSON.stringify(body)
-            });
+    if (!amount || amount <= 0) { alert("Соманы дұрыс жазыңыз!"); return; }
+    if (!dateVal) { alert("Күнді таңдаңыз!"); return; }
 
-            if(res.ok) {
-                // Toast хабарлама
-                const btn = document.querySelector('.btn-add');
-                btn.innerHTML = '<i class="fas fa-check"></i> Қосылды!';
-                setTimeout(() => { btn.innerText = 'Қосу'; }, 1500);
-                
-                document.getElementById("amount").value = "";
-                document.getElementById("desc").value = "";
-                loadData();
-            } else {
-                const err = await res.json();
-                alert("Қате: " + (err.detail ? JSON.stringify(err.detail) : "Санат таңдалмады ма?"));
-            }
+    const body = { 
+        amount: parseFloat(amount), 
+        description: document.getElementById("desc").value,
+        date: dateVal // <<-- ЕҢ МАҢЫЗДЫСЫ ОСЫ (Күнді жіберу керек)
+    };
+
+    if (currentType === 'expense') {
+        const catId = document.getElementById("cat-id").value;
+        if (!catId) { alert("Санатты таңдаңыз!"); return; }
+        body.category_id = parseInt(catId);
+    } else {
+        // Кіріс үшін (Income)
+        body.category_id = null; 
+    }
+
+    try {
+        const res = await fetch(`${API_URL}/${currentType}s/`, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+        });
+
+        if (res.ok) {
+            alert("Сәтті қосылды!");
+            document.getElementById("amount").value = "";
+            document.getElementById("desc").value = "";
+            loadData(); // Тізімді жаңарту
+        } else {
+            const err = await res.json();
+            alert("Қате: " + JSON.stringify(err.detail));
         }
+    } catch (e) {
+        alert("Серверге қосылу қатесі!");
+    }
+}
 
         function filterData() {
             const text = document.getElementById("search-input").value.toLowerCase();

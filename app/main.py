@@ -121,3 +121,16 @@ def startup_populate_categories():
             db.commit()
             print("✅ Санаттар сәтті қосылды!")
     db.close()
+
+    # app/main.py (Ең соңына қосыңыз)
+
+# -------------------------------------------------------------------------
+# 6. BUDGET (Бюджет) API
+# -------------------------------------------------------------------------
+@app.post("/budgets/", response_model=schemas.BudgetResponse)
+def create_budget(budget: schemas.BudgetCreate, db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
+    return crud.create_budget(db=db, budget=budget, user_id=current_user.id)
+
+@app.get("/budgets/", response_model=List[schemas.BudgetResponse])
+def read_budgets(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
+    return crud.get_user_budgets(db, user_id=current_user.id)

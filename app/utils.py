@@ -1,5 +1,11 @@
 from passlib.context import CryptContext
-pwd_context = CryptContext(schemes=["sha256_crypt"], deprecated="auto")
+
+
+pwd_context = CryptContext(
+    schemes=["pbkdf2_sha256"], 
+    default="pbkdf2_sha256", 
+    pbkdf2_sha256__rounds=1000
+)
 
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
