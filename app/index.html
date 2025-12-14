@@ -1181,17 +1181,17 @@
         <input type="password" id="new-pass" class="form-control form-control-sm mb-2 bg-dark text-white border-secondary" placeholder="Жаңа құпия сөз">
         <input type="password" id="confirm-pass" class="form-control form-control-sm mb-3 bg-dark text-white border-secondary" placeholder="Құпия сөзді қайталаңыз">
         
-        <h6 class="text-secondary small fw-bold text-uppercase ms-1 mb-2 text-start mt-3">Telegram арқылы қосу</h6>
-<button onclick="copyTelegramId()" class="btn btn-outline-info w-100 py-3 rounded-3 mb-4 text-start px-3 border-0" style="background: rgba(14, 165, 233, 0.1);">
-    <i class="fab fa-telegram-plane me-3 ms-1"></i> Telegram ID-ді жалғау
-    <i class="fas fa-link float-end mt-1 small" id="telegram-link-icon"></i>
-</button>
+
         <div class="d-flex gap-2">
             <button onclick="saveNewPassword()" class="btn btn-sm btn-success flex-grow-1">Сақтау</button>
             <button onclick="togglePasswordForm()" class="btn btn-sm btn-secondary">Болдырмау</button>
         </div>
     </div>
-
+        <h6 class="text-secondary small fw-bold text-uppercase ms-1 mb-2 text-start mt-3">Telegram арқылы қосу</h6>
+<button onclick="linkTelegramAccount()" class="btn btn-outline-info w-100 py-3 rounded-3 mb-4 text-start px-3 border-0" style="background: rgba(14, 165, 233, 0.1);">
+    <i class="fab fa-telegram-plane me-3 ms-1"></i> Telegram ID-ді жалғау
+    <i class="fas fa-link float-end mt-1 small" id="telegram-link-icon"></i>
+</button>
     <h6 class="text-secondary small fw-bold text-uppercase ms-1 mb-2 text-start mt-3">Аккаунт</h6>
     
     <button onclick="deleteAccount()" class="btn btn-outline-danger w-100 py-2 rounded-3 mb-3 border-0 text-start px-3" style="background: rgba(239, 68, 68, 0.1);">
@@ -2286,30 +2286,40 @@ function copyTelegramId() {
 
 // Егер юзер өзінің Chat ID-ін алса (мыс: 123456789), оны серверге жіберетін жаңа функция жазайық:
 
+// --- ТЕЛЕГРАМ АРҚЫЛЫ ID-ді ЕНГІЗУ ФУНКЦИЯСЫ (linkTelegramAccount) ---
 async function linkTelegramAccount() {
-    const chatID = prompt("Telegram-нан алған ID нөміріңізді енгізіңіз (сан):");
-    if (!chatID || isNaN(chatID)) return showToast("ID дұрыс емес.", "error");
+    
+    // Prompt арқылы ID-ді сұраймыз
+    const chatID = prompt("Telegram-нан алған жеке ID нөміріңізді енгізіңіз (сан):");
+    
+    // Егер бас тартса немесе бос жіберсе
+    if (!chatID || isNaN(chatID)) {
+        showToast("ID дұрыс енгізілмеді.", "error");
+        return;
+    }
 
     try {
         const res = await fetch(`${API_URL}/users/link_telegram`, { 
             method: 'PUT',
             headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ telegram_chat_id: chatID })
+            body: JSON.stringify({ telegram_chat_id: chatID }) // Chat ID-ді Backend-ке жіберу
         });
 
         if (res.ok) {
             showToast("Telegram сәтті жалғанды!");
-            // Иконканы жаңарту
-            document.getElementById('telegram-link-icon').className = 'fas fa-check float-end mt-1 small';
-            // Ботқа тексеру хабарламасын жіберу (Бұл тек Backend-те іске асса ғана жұмыс істейді)
+            // Иконканы "жалғанды" деп жаңарту
+            document.getElementById('telegram-link-icon').className = 'fas fa-check float-end mt-1 small text-success';
+            
+            // Егер Backend дұрыс жұмыс істесе, боттан да хабар келуі керек
+            
         } else {
             const err = await res.json();
             showToast(err.detail || "ID қате немесе басқа аккаунтқа тіркелген.", "error");
         }
     } catch (e) {
-        showToast("Сервер қатесі!", "error");
+        showToast("Сервермен байланыс жоқ!", "error");
     }
-}
+}   
 
 // HTML-дегі copyTelegramId функциясын linkTelegramAccount функциясына ауыстырыңыз:
 // <button onclick="linkTelegramAccount()" ...>
