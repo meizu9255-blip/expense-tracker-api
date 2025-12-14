@@ -7,6 +7,7 @@ from typing import List
 from jose import jwt, JWTError
 from pydantic import BaseModel
 from . import models, database, schemas, crud, utils
+import requests
 
 SECRET_KEY = "YOUR-ULTRA-SECRET-KEY"
 ALGORITHM = "HS256"
@@ -208,3 +209,63 @@ def delete_user_me(
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail="Өшіру кезінде қате шықты")
+    
+    # --- TELEGRAM ХАБАРЛАМА ЖІБЕРУ ФУНКЦИЯСЫ ---
+def send_telegram_alert(message: str):
+    # Сіздің жеке деректеріңіз:
+    bot_token = "8121209780:AAFM3mQsDDbJRtCOwKpP2D_EPeYNG_P8K4c"
+    chat_id = "1787694537"
+    
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    data = {
+        "chat_id": chat_id, 
+        "text": message, 
+        "parse_mode": "HTML"
+    }
+    
+    try:
+        requests.post(url, data=data)
+    except Exception as e:
+        print(f"Telegram error: {e}")
+        # --- ШЫҒЫН ҚОСУ (TELEGRAM-МЕН) ---
+@app.post("/expenses/", response_model=schemas.ExpenseResponse)
+def add_expense(
+    expense: schemas.ExpenseCreate, 
+    db: Session = Depends(get_db), 
+    current_user: schemas.User = Depends(get_current_user)
+):
+    # 1. Базаға сақтау
+    new_expense = crud.create_user_expense(db, expense, current_user.id)
+    
+    # 2. Telegram-ға хабарлама жіберу
+    msg = (
+        f"💸 <b>Жаңа шығын!</b>\n\n"
+        f"🔻 Сома: <b>{expense.amount} ₸</b>\n"
+        f"📝 Сипаттама: {expense.description}\n"
+        f"📅 Күні: {expense.date}"
+    )
+    send_telegram_alert(msg)
+    
+    return new_expense
+
+
+# --- ТӨЛЕМ ҚОСУ (TELEGRAM-МЕН) ---
+@app.post("/incomes/", response_model=schemas.IncomeResponse)
+def add_income(
+    income: schemas.IncomeCreate, 
+    db: Session = Depends(get_db), 
+    current_user: schemas.User = Depends(get_current_user)
+):
+    # 1. Базаға сақтау
+    new_income = crud.create_user_income(db, income, current_user.id)
+    
+    # 2. Telegram-ға хабарлама жіберу
+    msg = (
+        f"🤑 <b>Төлем түсті!</b>\n\n"
+        f"Wm Сома: <b>+{income.amount} ₸</b>\n"
+        f"📝 Сипаттама: {income.description}\n"
+        f"📅 Күні: {income.date}"
+    )
+    send_telegram_alert(msg)
+    
+    return new_income
