@@ -3,26 +3,31 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from datetime import timedelta, datetime
-from typing import List
+from typing import List, Optional
 from jose import jwt, JWTError
 from pydantic import BaseModel
-from . import models, database, schemas, crud, utils
 import requests 
 
+# app/models, app/database, app/schemas, app/crud, app/utils модульдерінен импорт
+from . import models, database, schemas, crud, utils
+
+
 # --- КОНСТАНТАЛАР (ӨЗГЕРТПЕҢІЗ) ---
-SECRET_KEY = "YOUR-ULTRA-SECRET-KEY"
+SECRET_KEY = "YOUR-ULTRA-SECRET-KEY" # Өзгерту қажет
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 BOT_TOKEN = "8121209780:AAFM3mQsDDbJRtCOwKpP2D_EPeYNG_P8K4c" # Сіздің Telegram бот токеныңіз
 
+
 # --- FASTAPI ҚОСЫМШАСЫНЫҢ ИНИЦИАЛИЗАЦИЯСЫ ---
 app = FastAPI()
 
-# 💥 FIX: Қате шығаратын DB инициализациясын алып тастау
+# 💥 FIX: Қате шығаратын DB инициализациясын алып тастау - ДҰРЫС.
 # database.Base.metadata.create_all(bind=database.engine) 
 
 
-# --- CORS КОНФИГУРАЦИЯСЫ (Сервермен байланыс қатесін жояды) ---
+# --- CORS КОНФИГУРАЦИЯСЫ (МАҢЫЗДЫ: Frontend/Backend байланысы) ---
+# FIX: allow_origins=["*"] - бұл жергілікті HTML файлын (origin 'null') және Render домендерін қолдануға рұқсат береді.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], # Барлық домендерден сұранысқа рұқсат
@@ -65,7 +70,8 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 def send_telegram_message(chat_id: str, text: str):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     try:
-        requests.post(url, data={"chat_id": chat_id, "text": text, "parse_mode": "HTML"})
+        # parse_mode=HTML (Болдыру үшін)
+        requests.post(url, data={"chat_id": chat_id, "text": text, "parse_mode": "HTML"}) 
     except:
         pass
 
@@ -151,8 +157,8 @@ def read_budgets(db: Session = Depends(get_db), current_user: schemas.User = Dep
 
 # --- ҚОЛДАНУШЫ ПРОФИЛІН ЖӘНЕ ҚҰПИЯ СӨЗІН ӨЗГЕРТУ (ПРОФИЛЬ МОДУЛІ) ---
 class UserUpdate(BaseModel):
-    username: str
-    email: str
+    username: Optional[str] = None # username өрісі міндетті емес
+    email: Optional[str] = None # email өрісі міндетті емес
 
 class UserPasswordUpdate(BaseModel):
     old_password: str
@@ -164,13 +170,13 @@ def update_user_profile(
     db: Session = Depends(get_db), 
     current_user: models.User = Depends(get_current_user)
 ):
-    if user_data.email != current_user.email:
+    if user_data.email and user_data.email != current_user.email:
         existing_user = crud.get_user_by_email(db, email=user_data.email)
         if existing_user:
             raise HTTPException(status_code=400, detail="Бұл email бос емес!")
+        current_user.email = user_data.email
     
-    current_user.email = user_data.email
-    if hasattr(current_user, "username"):
+    if user_data.username and hasattr(current_user, "username"):
         current_user.username = user_data.username
     
     try:
@@ -220,6 +226,7 @@ async def telegram_webhook(request: Request, db: Session = Depends(get_db)):
     try:
         data = await request.json()
         
+        # Егер бұл хабарлама емес, басқа типтегі жаңарту болса
         if "message" not in data:
             return {"status": "ok"}
             
@@ -236,28 +243,36 @@ async def telegram_webhook(request: Request, db: Session = Depends(get_db)):
                 send_telegram_message(chat_id, f"Сәлем, {user.username}! 👋\nМаған '5000 Обед' деп жазсаң, мен оны сенің шығының қылып тіркеймін.")
                 return {"status": "ok"}
                 
-            # Транзакцияны өңдеу
+            # Транзакцияны өңдеу логикасы: 'Сома Сипаттама'
             parts = text.split(" ", 1)
-            # Санды тексеру
-            if len(parts) >= 1 and parts[0].replace('.', '', 1).isdigit():
-                amount = float(parts[0])
-                description = parts[1] if len(parts) > 1 else "Telegram-нан"
-                category_id = 9 # "Басқа" шығын санаты
-                
-                new_expense = schemas.ExpenseCreate(
-                    amount=amount,
-                    description=description,
-                    date=datetime.now().strftime("%Y-%m-%d"),
-                    category_id=category_id
-                )
-                
-                # Транзакцияны НАҚТЫ ОСЫ ЮЗЕРГЕ жазу
-                crud.create_user_expense(db, new_expense, user.id)
-                
-                send_telegram_message(chat_id, f"✅ <b>Қабылданды!</b>\n➖ {amount} ₸\n📝 {description}")
             
-            else:
+            # Соманың дұрыс сандық форматта екенін тексеру
+            amount_str = parts[0]
+            try:
+                # Нүктесі бар санды да қабылдайды
+                amount = float(amount_str) 
+            except ValueError:
                 send_telegram_message(chat_id, "❌ Түсінбедім. Маған <b>'Сома Себеп'</b> деп жаз.\nМысалы: <code>2000 Такси</code>")
+                return {"status": "ok"}
+                
+            description = parts[1] if len(parts) > 1 else "Telegram-нан"
+            
+            # Санат ID-ін табу немесе әдепкі мәнді қою (Сіздің CRUD-ыңызда 9-шы ID бар деп есептейміз)
+            category_id = 9 # "Басқа" шығын санаты
+            
+            new_expense = schemas.ExpenseCreate(
+                amount=amount,
+                description=description,
+                # DB-ге жазу үшін қазіргі датаны string форматында береміз
+                date=datetime.now().strftime("%Y-%m-%d"), 
+                category_id=category_id
+            )
+            
+            # Транзакцияны НАҚТЫ ОСЫ ЮЗЕРГЕ жазу
+            crud.create_user_expense(db, new_expense, user.id)
+            
+            send_telegram_message(chat_id, f"✅ <b>Қабылданды!</b>\n➖ {amount} ₸\n📝 {description}")
+            
         
         # 3. Егер қолданушы тіркелмесе
         else:
@@ -267,14 +282,18 @@ async def telegram_webhook(request: Request, db: Session = Depends(get_db)):
             )
             
     except Exception as e:
+        # Қате туындаған кезде жауап беру (webhook-тің қайта жіберуін болдырмау үшін)
         print(f"Webhook Error: {e}")
     
     return {"status": "ok"}
 
 # --- TELEGRAM ID-ді Аккаунтқа жалғау ---
+class TelegramLink(BaseModel):
+    telegram_chat_id: str
+    
 @app.put("/users/link_telegram")
 def link_telegram_id(
-    link_data: schemas.TelegramLink, 
+    link_data: TelegramLink, 
     current_user: models.User = Depends(get_current_user), 
     db: Session = Depends(get_db)
 ):
