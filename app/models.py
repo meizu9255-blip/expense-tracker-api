@@ -10,12 +10,13 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
+    telegram_chat_id = Column(String, unique=True, nullable=True)   
     
     categories = relationship("Category", back_populates="owner")
     expenses = relationship("Expense", back_populates="owner")
     incomes = relationship("Income", back_populates="owner")
     budgets = relationship("Budget", back_populates="owner")
-    telegram_chat_id = Column(String, unique=True, nullable=True)
+    
 
 class Category(Base):
     __tablename__ = "categories"
