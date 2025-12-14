@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from datetime import timedelta, datetime
 from typing import List
 from jose import jwt, JWTError
+from pydantic import BaseModel
 from . import models, database, schemas, crud, utils
 
 SECRET_KEY = "YOUR-ULTRA-SECRET-KEY"
@@ -101,14 +102,11 @@ def get_balance(db: Session = Depends(get_db), current_user: schemas.User = Depe
 @app.get("/statistics/expenses/", response_model=List[schemas.CategoryStats])
 def get_stats(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.get_expenses_by_category(db, current_user.id)
-# app/main.py (ФАЙЛДЫҢ ЕҢ СОҢЫНА ҚОСЫҢЫЗ)
 
 @app.on_event("startup")
 def startup_populate_categories():
     db = database.SessionLocal()
-    # Егер базада санаттар жоқ болса, біз оларды қосамыз
     if db.query(models.Category).count() == 0:
-        # Алдымен админді табамыз (ID=1 болуы керек)
         user = db.query(models.User).first()
         if user:
             categories = [
@@ -122,7 +120,6 @@ def startup_populate_categories():
             print("✅ Санаттар сәтті қосылды!")
     db.close()
 
-    # app/main.py (Ең соңына қосыңыз)
 
 # -------------------------------------------------------------------------
 # 6. BUDGET (Бюджет) API
@@ -134,3 +131,66 @@ def create_budget(budget: schemas.BudgetCreate, db: Session = Depends(get_db), c
 @app.get("/budgets/", response_model=List[schemas.BudgetResponse])
 def read_budgets(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.get_user_budgets(db, user_id=current_user.id)
+
+# ============================================================
+# ⬇️ ОСЫ КОДТЫ MAIN.PY ФАЙЛЫНЫҢ ЕҢ АСТЫНА ҚОЙЫҢЫЗ ⬇️
+# ============================================================
+
+from pydantic import BaseModel
+
+# 1. Деректерді қабылдайтын формалар (Схемалар)
+class UserUpdate(BaseModel):
+    username: str
+    email: str
+
+class UserPasswordUpdate(BaseModel):
+    old_password: str
+    new_password: str
+
+# 2. Логин мен Атын өзгерту функциясы
+@app.put("/users/me")
+def update_user_profile(
+    user_data: UserUpdate, 
+    db: Session = Depends(get_db), 
+    current_user: models.User = Depends(get_current_user)
+):
+    # Егер жаңа email басқа біреуде бар болса, қате береміз
+    if user_data.email != current_user.email:
+        existing_user = crud.get_user_by_email(db, email=user_data.email)
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Бұл email бос емес!")
+
+    # Деректерді жаңарту
+    current_user.email = user_data.email
+    
+    # Егер базада username бағаны болса, оны да жаңартамыз
+    # (Егер қате шықса, model-де username жоқ деген сөз, бірақ көбіне болады)
+    if hasattr(current_user, "username"):
+        current_user.username = user_data.username
+    
+    try:
+        db.commit()
+        db.refresh(current_user)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Сақтау кезінде қате шықты")
+        
+    return current_user
+
+# 3. Құпия сөзді (Пароль) өзгерту функциясы
+@app.put("/users/password")
+def change_user_password(
+    pass_data: UserPasswordUpdate, 
+    db: Session = Depends(get_db), 
+    current_user: models.User = Depends(get_current_user)
+):
+    # Ескі пароль дұрыс па? (Тексереміз)
+    if not utils.verify_password(pass_data.old_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Ескі құпия сөз қате!")
+
+    # Жаңа парольді шифрлап сақтаймыз
+    current_user.hashed_password = utils.get_password_hash(pass_data.new_password)
+    
+    db.commit()
+    
+    return {"message": "Құпия сөз сәтті өзгертілді!"}
