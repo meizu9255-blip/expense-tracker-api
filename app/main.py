@@ -210,62 +210,71 @@ def delete_user_me(
         db.rollback()
         raise HTTPException(status_code=500, detail="Өшіру кезінде қате шықты")
     
-    # --- TELEGRAM ХАБАРЛАМА ЖІБЕРУ ФУНКЦИЯСЫ ---
-def send_telegram_alert(message: str):
-    # Сіздің жеке деректеріңіз:
-    bot_token = "8121209780:AAFM3mQsDDbJRtCOwKpP2D_EPeYNG_P8K4c"
-    chat_id = "1787694537"
-    
-    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-    data = {
-        "chat_id": chat_id, 
-        "text": message, 
-        "parse_mode": "HTML"
-    }
-    
+    # ============================================================
+# TELEGRAM БОТ АРҚЫЛЫ ТРАНЗАКЦИЯ ҚОСУ (WEBHOOK)
+# ============================================================
+from fastapi import Request
+
+# СІЗДІҢ ТОКЕНІҢІЗДІ ОСЫ ЖЕРГЕ ЖАЗЫҢЫЗ:
+BOT_TOKEN = "8121209780:AAFM3mQsDDbJRtCOwKpP2D_EPeYNG_P8K4c"
+
+# Телеграмға жауап қайтару функциясы
+def send_telegram_message(chat_id: int, text: str):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     try:
-        requests.post(url, data=data)
+        requests.post(url, data={"chat_id": chat_id, "text": text, "parse_mode": "HTML"})
+    except:
+        pass
+
+@app.post("/webhook")
+async def telegram_webhook(request: Request, db: Session = Depends(get_db)):
+    try:
+        data = await request.json()
+        
+        # Хабарлама бар ма тексереміз
+        if "message" not in data:
+            return {"status": "ok"}
+            
+        chat_id = data["message"]["chat"]["id"]
+        text = data["message"].get("text", "")
+        
+        # 1. Егер /start деп жазса
+        if text == "/start":
+            send_telegram_message(chat_id, "Сәлем! 👋\nМаған <b>'5000 Обед'</b> деп жазсаң, мен оны шығын қылып тіркеймін.")
+            return {"status": "ok"}
+
+        # 2. Мәтінді бөліп көреміз (Мысалы: "5000 Обед")
+        parts = text.split(" ", 1) # Бос орын арқылы екіге бөлу
+        
+        # Егер бірінші сөз сан болса (5000)
+        if len(parts) >= 1 and parts[0].isdigit():
+            amount = float(parts[0])
+            description = parts[1] if len(parts) > 1 else "Telegram-нан"
+            
+            # --- БАЗАҒА ЖАЗУ ---
+            # Біз User ID = 1 (Админ) үшін жазамыз. 
+            # Егер басқа юзер болса, логиканы күрделендіру керек.
+            user_id = 1 
+            
+            # Санатты (Category) автоматты түрде "Басқа" (ID=9) деп аламыз
+            # Немесе description ішінде "тамақ" сөзі болса ID=1 қылуға болады (Smart Logic)
+            category_id = 9 
+            
+            new_expense = schemas.ExpenseCreate(
+                amount=amount,
+                description=description,
+                date=datetime.now().strftime("%Y-%m-%d"),
+                category_id=category_id
+            )
+            
+            crud.create_user_expense(db, new_expense, user_id)
+            
+            send_telegram_message(chat_id, f"✅ <b>Қабылданды!</b>\n➖ {amount} ₸\n📝 {description}")
+        
+        else:
+            send_telegram_message(chat_id, "❌ Түсінбедім. Маған <b>'Сома Себеп'</b> деп жаз.\nМысалы: <code>2000 Такси</code>")
+
     except Exception as e:
-        print(f"Telegram error: {e}")
-        # --- ШЫҒЫН ҚОСУ (TELEGRAM-МЕН) ---
-@app.post("/expenses/", response_model=schemas.ExpenseResponse)
-def add_expense(
-    expense: schemas.ExpenseCreate, 
-    db: Session = Depends(get_db), 
-    current_user: schemas.User = Depends(get_current_user)
-):
-    # 1. Базаға сақтау
-    new_expense = crud.create_user_expense(db, expense, current_user.id)
+        print(f"Error: {e}")
     
-    # 2. Telegram-ға хабарлама жіберу
-    msg = (
-        f"💸 <b>Жаңа шығын!</b>\n\n"
-        f"🔻 Сома: <b>{expense.amount} ₸</b>\n"
-        f"📝 Сипаттама: {expense.description}\n"
-        f"📅 Күні: {expense.date}"
-    )
-    send_telegram_alert(msg)
-    
-    return new_expense
-
-
-# --- ТӨЛЕМ ҚОСУ (TELEGRAM-МЕН) ---
-@app.post("/incomes/", response_model=schemas.IncomeResponse)
-def add_income(
-    income: schemas.IncomeCreate, 
-    db: Session = Depends(get_db), 
-    current_user: schemas.User = Depends(get_current_user)
-):
-    # 1. Базаға сақтау
-    new_income = crud.create_user_income(db, income, current_user.id)
-    
-    # 2. Telegram-ға хабарлама жіберу
-    msg = (
-        f"🤑 <b>Төлем түсті!</b>\n\n"
-        f"Wm Сома: <b>+{income.amount} ₸</b>\n"
-        f"📝 Сипаттама: {income.description}\n"
-        f"📅 Күні: {income.date}"
-    )
-    send_telegram_alert(msg)
-    
-    return new_income
+    return {"status": "ok"}
