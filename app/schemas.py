@@ -1,7 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field 
 from typing import Optional, List
 from datetime import date
-from pydantic import BaseModel
 
 # ----------------------------------------------------
 # 1. USER (Қолданушы)
@@ -111,7 +110,7 @@ class CategoryStats(BaseModel):
     category_name: str
     total_amount: float
 
-
+from pydantic import BaseModel
 
 class TelegramLink(BaseModel):
     telegram_chat_id: str
