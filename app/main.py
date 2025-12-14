@@ -7,7 +7,7 @@ from typing import List
 from jose import jwt, JWTError
 from pydantic import BaseModel
 from . import models, database, schemas, crud, utils
-import requests
+import requests 
 
 SECRET_KEY = "YOUR-ULTRA-SECRET-KEY"
 ALGORITHM = "HS256"
@@ -254,7 +254,7 @@ async def telegram_webhook(request: Request, db: Session = Depends(get_db)):
             # --- БАЗАҒА ЖАЗУ ---
             # Біз User ID = 1 (Админ) үшін жазамыз. 
             # Егер басқа юзер болса, логиканы күрделендіру керек.
-            user_id = 1 
+            user_id = 14 
             
             # Санатты (Category) автоматты түрде "Басқа" (ID=9) деп аламыз
             # Немесе description ішінде "тамақ" сөзі болса ID=1 қылуға болады (Smart Logic)
