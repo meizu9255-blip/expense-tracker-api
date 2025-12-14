@@ -194,3 +194,17 @@ def change_user_password(
     db.commit()
     
     return {"message": "Құпия сөз сәтті өзгертілді!"}
+# --- 4. АККАУНТТЫ ӨШІРУ (DELETE /users/me) ---
+@app.delete("/users/me")
+def delete_user_me(
+    db: Session = Depends(get_db), 
+    current_user: models.User = Depends(get_current_user)
+):
+    try:
+        # Қолданушыны базадан өшіру
+        db.delete(current_user)
+        db.commit()
+        return {"message": "Аккаунт және барлық деректер сәтті өшірілді!"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Өшіру кезінде қате шықты")
