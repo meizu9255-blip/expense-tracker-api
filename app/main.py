@@ -13,7 +13,6 @@ SECRET_KEY = "YOUR-ULTRA-SECRET-KEY"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-database.Base.metadata.create_all(bind=database.engine)
 app = FastAPI()
 
 app.add_middleware(
