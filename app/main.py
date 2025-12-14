@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -9,20 +9,30 @@ from pydantic import BaseModel
 from . import models, database, schemas, crud, utils
 import requests 
 
+# --- КОНСТАНТАЛАР (ӨЗГЕРТПЕҢІЗ) ---
 SECRET_KEY = "YOUR-ULTRA-SECRET-KEY"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+BOT_TOKEN = "8121209780:AAFM3mQsDDbJRtCOwKpP2D_EPeYNG_P8K4c" # Сіздің Telegram бот токеныңіз
 
+# --- FASTAPI ҚОСЫМШАСЫНЫҢ ИНИЦИАЛИЗАЦИЯСЫ ---
 app = FastAPI()
 
+# 💥 FIX: Қате шығаратын DB инициализациясын алып тастау
+# database.Base.metadata.create_all(bind=database.engine) 
+
+
+# --- CORS КОНФИГУРАЦИЯСЫ (Сервермен байланыс қатесін жояды) ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"], # Барлық домендерден сұранысқа рұқсат
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+
+# --- DEPENDENCIES ---
 def get_db():
     db = database.SessionLocal()
     try:
@@ -32,6 +42,8 @@ def get_db():
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
+# --- АУТЕНТИФИКАЦИЯ ЖӘНЕ ТОКЕН ФУНКЦИЯЛАРЫ ---
 def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -48,17 +60,32 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     if user is None: raise HTTPException(status_code=401, detail="User not found")
     return user
 
+
+# --- ТЕЛЕГРАМ ХАБАРЛАМАСЫН ЖІБЕРУ ФУНКЦИЯСЫ ---
+def send_telegram_message(chat_id: str, text: str):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    try:
+        requests.post(url, data={"chat_id": chat_id, "text": text, "parse_mode": "HTML"})
+    except:
+        pass
+
+
+# =========================================================================
+# ⬇️ API ROUTERS (Endpoint) ⬇️
+# =========================================================================
+
+# --- АУТЕНТИФИКАЦИЯ (ТІРКЕЛУ/КІРУ) ---
 @app.post("/users/", response_model=schemas.User)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     if crud.get_user_by_email(db, email=user.email):
-        raise HTTPException(status_code=400, detail="Email registered")
+        raise HTTPException(status_code=400, detail="Бұл email тіркелген!")
     return crud.create_user(db=db, user=user)
 
 @app.post("/token")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = crud.get_user_by_email(db, email=form_data.username)
     if not user or not utils.verify_password(form_data.password, user.hashed_password):
-        raise HTTPException(status_code=401, detail="Incorrect email or password")
+        raise HTTPException(status_code=401, detail="Қате email немесе құпия сөз")
     access_token = create_access_token(data={"sub": user.email})
     return {"access_token": access_token, "token_type": "bearer"}
 
@@ -66,6 +93,8 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 def read_users_me(current_user: schemas.User = Depends(get_current_user)):
     return current_user
 
+
+# --- КАТЕГОРИЯЛАР (Басқару) ---
 @app.post("/categories/", response_model=schemas.CategoryResponse)
 def add_category(category: schemas.CategoryCreate, db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.create_user_category(db, category, current_user.id)
@@ -74,6 +103,8 @@ def add_category(category: schemas.CategoryCreate, db: Session = Depends(get_db)
 def get_categories(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.get_user_categories(db, current_user.id)
 
+
+# --- ШЫҒЫНДАР (EXPENSES) ---
 @app.post("/expenses/", response_model=schemas.ExpenseResponse)
 def add_expense(expense: schemas.ExpenseCreate, db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.create_user_expense(db, expense, current_user.id)
@@ -85,8 +116,10 @@ def get_expenses(db: Session = Depends(get_db), current_user: schemas.User = Dep
 @app.delete("/expenses/{expense_id}")
 def delete_expense(expense_id: int, db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     crud.delete_user_expense(db, expense_id, current_user.id)
-    return {"message": "Deleted"}
+    return {"message": "Сәтті өшірілді"}
 
+
+# --- КІРІСТЕР (INCOMES) ---
 @app.post("/incomes/", response_model=schemas.IncomeResponse)
 def add_income(income: schemas.IncomeCreate, db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.create_user_income(db, income, current_user.id)
@@ -95,6 +128,8 @@ def add_income(income: schemas.IncomeCreate, db: Session = Depends(get_db), curr
 def get_incomes(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.get_user_incomes(db, current_user.id)
 
+
+# --- БАЛАНС ЖӘНЕ СТАТИСТИКА ---
 @app.get("/balance/", response_model=schemas.BalanceResponse)
 def get_balance(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.get_user_balance(db, current_user.id)
@@ -103,27 +138,8 @@ def get_balance(db: Session = Depends(get_db), current_user: schemas.User = Depe
 def get_stats(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.get_expenses_by_category(db, current_user.id)
 
-@app.on_event("startup")
-def startup_populate_categories():
-    db = database.SessionLocal()
-    if db.query(models.Category).count() == 0:
-        user = db.query(models.User).first()
-        if user:
-            categories = [
-                "Тамақ", "Көлік", "Сатып алу", "Ойын-сауық", 
-                "Коммуналдық", "Денсаулық", "Білім", "Саяхат", "Басқа"
-            ]
-            for cat_name in categories:
-                new_cat = models.Category(name=cat_name, user_id=user.id)
-                db.add(new_cat)
-            db.commit()
-            print("✅ Санаттар сәтті қосылды!")
-    db.close()
 
-
-# -------------------------------------------------------------------------
-# 6. BUDGET (Бюджет) API
-# -------------------------------------------------------------------------
+# --- БЮДЖЕТ API ---
 @app.post("/budgets/", response_model=schemas.BudgetResponse)
 def create_budget(budget: schemas.BudgetCreate, db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.create_budget(db=db, budget=budget, user_id=current_user.id)
@@ -132,13 +148,8 @@ def create_budget(budget: schemas.BudgetCreate, db: Session = Depends(get_db), c
 def read_budgets(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.get_user_budgets(db, user_id=current_user.id)
 
-# ============================================================
-# ⬇️ ОСЫ КОДТЫ MAIN.PY ФАЙЛЫНЫҢ ЕҢ АСТЫНА ҚОЙЫҢЫЗ ⬇️
-# ============================================================
 
-from pydantic import BaseModel
-
-# 1. Деректерді қабылдайтын формалар (Схемалар)
+# --- ҚОЛДАНУШЫ ПРОФИЛІН ЖӘНЕ ҚҰПИЯ СӨЗІН ӨЗГЕРТУ (ПРОФИЛЬ МОДУЛІ) ---
 class UserUpdate(BaseModel):
     username: str
     email: str
@@ -147,24 +158,18 @@ class UserPasswordUpdate(BaseModel):
     old_password: str
     new_password: str
 
-# 2. Логин мен Атын өзгерту функциясы
 @app.put("/users/me")
 def update_user_profile(
     user_data: UserUpdate, 
     db: Session = Depends(get_db), 
     current_user: models.User = Depends(get_current_user)
 ):
-    # Егер жаңа email басқа біреуде бар болса, қате береміз
     if user_data.email != current_user.email:
         existing_user = crud.get_user_by_email(db, email=user_data.email)
         if existing_user:
             raise HTTPException(status_code=400, detail="Бұл email бос емес!")
-
-    # Деректерді жаңарту
-    current_user.email = user_data.email
     
-    # Егер базада username бағаны болса, оны да жаңартамыз
-    # (Егер қате шықса, model-де username жоқ деген сөз, бірақ көбіне болады)
+    current_user.email = user_data.email
     if hasattr(current_user, "username"):
         current_user.username = user_data.username
     
@@ -177,55 +182,39 @@ def update_user_profile(
         
     return current_user
 
-# 3. Құпия сөзді (Пароль) өзгерту функциясы
 @app.put("/users/password")
 def change_user_password(
     pass_data: UserPasswordUpdate, 
     db: Session = Depends(get_db), 
     current_user: models.User = Depends(get_current_user)
 ):
-    # Ескі пароль дұрыс па? (Тексереміз)
     if not utils.verify_password(pass_data.old_password, current_user.hashed_password):
         raise HTTPException(status_code=400, detail="Ескі құпия сөз қате!")
 
-    # Жаңа парольді шифрлап сақтаймыз
     current_user.hashed_password = utils.get_password_hash(pass_data.new_password)
-    
     db.commit()
     
     return {"message": "Құпия сөз сәтті өзгертілді!"}
-# --- 4. АККАУНТТЫ ӨШІРУ (DELETE /users/me) ---
+
 @app.delete("/users/me")
 def delete_user_me(
     db: Session = Depends(get_db), 
     current_user: models.User = Depends(get_current_user)
 ):
     try:
-        # Қолданушыны базадан өшіру
         db.delete(current_user)
         db.commit()
         return {"message": "Аккаунт және барлық деректер сәтті өшірілді!"}
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail="Өшіру кезінде қате шықты")
-    
-    # ============================================================
-# TELEGRAM БОТ АРҚЫЛЫ ТРАНЗАКЦИЯ ҚОСУ (WEBHOOK)
-# ============================================================
-from fastapi import Request
 
-# СІЗДІҢ ТОКЕНІҢІЗДІ ОСЫ ЖЕРГЕ ЖАЗЫҢЫЗ:
-BOT_TOKEN = "8121209780:AAFM3mQsDDbJRtCOwKpP2D_EPeYNG_P8K4c"
 
-# Телеграмға жауап қайтару функциясы
-def send_telegram_message(chat_id: int, text: str):
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    try:
-        requests.post(url, data={"chat_id": chat_id, "text": text, "parse_mode": "HTML"})
-    except:
-        pass
+# =========================================================================
+# ⬇️ ТЕЛЕГРАМ ИНТЕГРАЦИЯСЫ (КӨП ЮЗЕРЛІ ЖҮЙЕ) ⬇️
+# =========================================================================
 
-# --- TELEGRAM WEBHOOK (КӨП ЮЗЕРЛІ НҰСҚА) ---
+# --- TELEGRAM WEBHOOK (Транзакцияларды қабылдау) ---
 @app.post("/webhook")
 async def telegram_webhook(request: Request, db: Session = Depends(get_db)):
     try:
@@ -249,7 +238,8 @@ async def telegram_webhook(request: Request, db: Session = Depends(get_db)):
                 
             # Транзакцияны өңдеу
             parts = text.split(" ", 1)
-            if len(parts) >= 1 and parts[0].replace('.', '', 1).isdigit(): # Санды тексеру
+            # Санды тексеру
+            if len(parts) >= 1 and parts[0].replace('.', '', 1).isdigit():
                 amount = float(parts[0])
                 description = parts[1] if len(parts) > 1 else "Telegram-нан"
                 category_id = 9 # "Басқа" шығын санаты
@@ -261,7 +251,7 @@ async def telegram_webhook(request: Request, db: Session = Depends(get_db)):
                     category_id=category_id
                 )
                 
-                # Транзакцияны НАҚТЫ ОСЫ ЮЗЕРГЕ жазамыз
+                # Транзакцияны НАҚТЫ ОСЫ ЮЗЕРГЕ жазу
                 crud.create_user_expense(db, new_expense, user.id)
                 
                 send_telegram_message(chat_id, f"✅ <b>Қабылданды!</b>\n➖ {amount} ₸\n📝 {description}")
@@ -299,7 +289,7 @@ def link_telegram_id(
     db.commit()
     db.refresh(current_user)
     
-    # 3. Юзерге бот арқылы тексеру хабарламасын жіберу (міндетті емес, бірақ жақсы)
+    # 3. Юзерге бот арқылы тексеру хабарламасын жіберу
     send_telegram_message(link_data.telegram_chat_id, 
         f"🥳 <b>Құттықтаймыз, {current_user.username}!</b>\n\nСіздің Qarjy Pro аккаунтыңыз сәтті жалғанды.\nЕнді маған жай ғана '5000 Обед' деп жазсаңыз болады."
     )
