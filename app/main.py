@@ -7,6 +7,7 @@ from typing import List, Optional
 from jose import jwt, JWTError
 from pydantic import BaseModel
 import requests 
+from . import models, database, schemas, crud, utils
 
 # app/models, app/database, app/schemas, app/crud, app/utils модульдерінен импорт
 from . import models, database, schemas, crud, utils
@@ -22,6 +23,7 @@ BOT_TOKEN = "8121209780:AAFM3mQsDDbJRtCOwKpP2D_EPeYNG_P8K4c" # Сіздің Tele
 # --- FASTAPI ҚОСЫМШАСЫНЫҢ ИНИЦИАЛИЗАЦИЯСЫ ---
 app = FastAPI()
 
+database.Base.metadata.create_all(bind=database.engine)
 # 💥 FIX: Қате шығаратын DB инициализациясын алып тастау - ДҰРЫС.
 # database.Base.metadata.create_all(bind=database.engine) 
 
