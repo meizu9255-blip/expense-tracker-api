@@ -1187,11 +1187,6 @@
             <button onclick="togglePasswordForm()" class="btn btn-sm btn-secondary">Болдырмау</button>
         </div>
     </div>
-        <h6 class="text-secondary small fw-bold text-uppercase ms-1 mb-2 text-start mt-3">Telegram арқылы қосу</h6>
-<button onclick="linkTelegramAccount()" class="btn btn-outline-info w-100 py-3 rounded-3 mb-4 text-start px-3 border-0" style="background: rgba(14, 165, 233, 0.1);">
-    <i class="fab fa-telegram-plane me-3 ms-1"></i> Telegram ID-ді жалғау
-    <i class="fas fa-link float-end mt-1 small" id="telegram-link-icon"></i>
-</button>
     <h6 class="text-secondary small fw-bold text-uppercase ms-1 mb-2 text-start mt-3">Аккаунт</h6>
     
     <button onclick="deleteAccount()" class="btn btn-outline-danger w-100 py-2 rounded-3 mb-3 border-0 text-start px-3" style="background: rgba(239, 68, 68, 0.1);">
@@ -2264,105 +2259,7 @@ function showApp() {
         alert("Профиль сәтті жаңартылды!");
         toggleEditMode(); // Режимді жабу
     }
-    // --- 5. TELEGRAM ID-ді көшіру және жалғау ---
-function copyTelegramId() {
-    const tempElement = document.createElement('textarea');
     
-    // Бұл жерде сіздің Chat ID-іңізді пайдалану керек. 
-    // Бірақ қазір біз оны білмейміз. Ең дұрысы - боттың адресін беру.
-    const bot_username = '@MeningQarjyBot';
-    
-    // Жаңа адамға нұсқаулық: ботқа "Сәлем" деп жаз, сосын бізге Chat ID-іңді бер.
-    const instruction = "1. Telegram-нан " + bot_username + " ботын тап.\n2. Ботқа 'Сәлем' немесе /start деп жаз.\n3. Маған ID нөміріңді жібер.";
-
-    alert("Келесі қадамдарды орындаңыз:\n\n" + instruction);
-
-    // Бұл әзірге тек нұсқаулық береді, ID-ді қолмен енгізетін функцияны кейін қосамыз.
-}
-
-// Ескерту: Нағыз жұмыс істеу үшін, юзер өзінің Telegram ID-ін бізге беруі керек.
-// Мұны жеңілдету үшін, мен сізге бұрынғыша BotFather-ден алған ID-іңізді қолдануға мүмкіндік беремін.
-// Бұл тек демонстрация үшін ыңғайлы.
-
-// Егер юзер өзінің Chat ID-ін алса (мыс: 123456789), оны серверге жіберетін жаңа функция жазайық:
-
-// --- ТЕЛЕГРАМ АРҚЫЛЫ ID-ді ЕНГІЗУ ФУНКЦИЯСЫ (linkTelegramAccount) ---
-async function linkTelegramAccount() {
-    
-    // Боттың username-ін анықтау
-    const BOT_USERNAME = '@MeningQarjyBot';
-    const INFO_BOT = '@userinfobot';
-    
-    // ID-ді алу нұсқаулығын Alert терезесіне шығару
-    const instruction = 
-        `📢 1. Telegram-нан ${INFO_BOT} ботын тауып, оған "Start" басыңыз. \n` +
-        `2. ${INFO_BOT} сізге <b>ID: XXXXXXXXXX</b> деген санды береді. \n` +
-        `3. Осы санды көшіріп алыңыз.\n\n` +
-        `4. Содан кейін ғана ID-ні төмендегі терезеге енгізіңіз.`;
-    
-    // Алдымен нұсқаулықты көрсету (Prompt-тан бұрын)
-    alert(instruction);
-    
-    // Prompt арқылы ID-ді сұраймыз
-    const chatID = prompt("Telegram-нан алған жеке ID нөміріңізді енгізіңіз (тек санды):");
-    
-    // Егер бас тартса немесе бос жіберсе
-    if (!chatID) {
-        showToast("Жалғау тоқтатылды.", "error");
-        return;
-    }
-    if (isNaN(chatID)) {
-        showToast("ID тек сандардан тұруы керек!", "error");
-        return;
-    }
-
-    try {
-        // ... (API-ге жіберу логикасы бұрынғыдай) ...
-        const res = await fetch(`${API_URL}/users/link_telegram`, { 
-            method: 'PUT',
-            headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ telegram_chat_id: chatID })
-        });
-
-        if (res.ok) {
-            showToast("Telegram сәтті жалғанды!");
-            // Иконканы жаңарту
-            document.getElementById('telegram-link-icon').className = 'fas fa-check float-end mt-1 small text-success';
-        } else {
-            const err = await res.json();
-            showToast(err.detail || "ID қате немесе басқа аккаунтқа тіркелген.", "error");
-        }
-    } catch (e) {
-        showToast("Сервермен байланыс жоқ!", "error");
-    }
-}
-// HTML-дегі copyTelegramId функциясын linkTelegramAccount функциясына ауыстырыңыз:
-// <button onclick="linkTelegramAccount()" ...>
-    // --- ПРОФИЛЬДІ АШАТЫН ФУНКЦИЯ (ЕҢ АСТЫНДА ТҰРУ КЕРЕК) ---
-function openProfileModal() {
-    console.log("Профиль ашылуда..."); // Тексеру үшін
-
-    // 1. Header-ден аты мен почтасын аламыз
-    const nameText = document.getElementById("header-user-name")?.innerText || "Қонақ";
-    const emailText = document.getElementById("header-user-email")?.innerText || "email@joq.kz";
-    
-    // 2. Модаль ішіне жазамыз
-    const modalName = document.getElementById("profile-name");
-    const modalEmail = document.getElementById("profile-email");
-    const modalCount = document.getElementById("profile-tx-count");
-
-    if(modalName) modalName.innerText = nameText;
-    if(modalEmail) modalEmail.innerText = emailText;
-    
-    // 3. Транзакция санын санап қоямыз (егер array бар болса)
-    if(modalCount && typeof allTransactions !== 'undefined') {
-        modalCount.innerText = allTransactions.length;
-    }
-    // 4. ТЕРЕЗЕНІ АШАМЫЗ (Bootstrap)
-    // "profileModal" деген ID сіздің HTML-де бар екеніне көз жеткізіңіз
-    const myModal = new bootstrap.Modal(document.getElementById('profileModal'));
-    myModal.show();
-}
 // --- ПРОФИЛЬ ФУНКЦИЯЛАРЫ ---
 
 // 1. Аккаунтты өшіру функциясы (Симуляция)

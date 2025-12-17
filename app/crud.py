@@ -31,7 +31,7 @@ def create_user_expense(db: Session, expense: schemas.ExpenseCreate, user_id: in
         amount=expense.amount,
         description=expense.description,
         category_id=expense.category_id,
-        date=expense.date, # Дұрысталды
+        date=expense.date, 
         user_id=user_id
     )
     db.add(db_expense)
@@ -53,7 +53,7 @@ def create_user_income(db: Session, income: schemas.IncomeCreate, user_id: int):
         amount=income.amount,
         description=income.description,
         category_id=income.category_id,
-        date=income.date, # Дұрысталды
+        date=income.date, 
         user_id=user_id
     )
     db.add(db_income)
