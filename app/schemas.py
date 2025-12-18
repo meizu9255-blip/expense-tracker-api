@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field 
 from typing import Optional, List
-from datetime import date
+from datetime import date as DateType  
 
 # ----------------------------------------------------
 # 1. USER (Қолданушы)
@@ -10,7 +10,6 @@ class UserBase(BaseModel):
     email: EmailStr
 
 class UserCreate(UserBase):
-    # ВАЛИДАЦИЯ: Пароль кемінде 4 символ болуы керек
     password: str = Field(..., min_length=4) 
 
 class User(UserBase):
@@ -35,18 +34,17 @@ class CategoryResponse(CategoryCreate):
 # 3. EXPENSE (Шығын)
 # ----------------------------------------------------
 class ExpenseBase(BaseModel):
-    # ВАЛИДАЦИЯ: Сома 0-ден үлкен болуы керек (gt = greater than)
     amount: float = Field(..., gt=0) 
     description: Optional[str] = None
     category_id: int 
-    date: date 
+    date: DateType  
 
 class ExpenseCreate(ExpenseBase):
     pass
 
 class ExpenseResponse(ExpenseBase):
     id: int
-    date: date 
+    date: DateType 
     user_id: int
     class Config:
         from_attributes = True
@@ -55,17 +53,16 @@ class ExpenseResponse(ExpenseBase):
 # 4. INCOME (Кіріс)
 # ----------------------------------------------------
 class IncomeBase(BaseModel):
-    # ВАЛИДАЦИЯ: Сома 0-ден үлкен болуы керек
     amount: float = Field(..., gt=0)
     description: Optional[str] = None
     category_id: Optional[int] = None
     
 class IncomeCreate(IncomeBase):
-    date: date
+    date: DateType 
 
 class IncomeResponse(IncomeBase):
     id: int
-    date: date 
+    date: DateType 
     user_id: int
     class Config:
         from_attributes = True
@@ -74,11 +71,10 @@ class IncomeResponse(IncomeBase):
 # 5. BUDGET (Бюджет)
 # ----------------------------------------------------
 class BudgetBase(BaseModel):
-    # ВАЛИДАЦИЯ: Лимит те оң сан болуы керек
     limit_amount: float = Field(..., gt=0)
     category_id: int
-    start_date: date
-    end_date: date
+    start_date: DateType 
+    end_date: DateType   
 
 class BudgetCreate(BudgetBase):
     pass
@@ -93,10 +89,10 @@ class BudgetResponse(BudgetBase):
 # 6. EXPENSE UPDATE
 # ----------------------------------------------------
 class ExpenseUpdate(BaseModel):
-    amount: Optional[float] = Field(None, gt=0) # Өзгерткенде де тексереміз
+    amount: Optional[float] = Field(None, gt=0) 
     description: Optional[str] = None
     category_id: Optional[int] = None
-    date: Optional[date] = None
+    date: Optional[DateType] = None 
 
 # ----------------------------------------------------
 # 7. BALANCE & STATS
@@ -109,8 +105,6 @@ class BalanceResponse(BaseModel):
 class CategoryStats(BaseModel):
     category_name: str
     total_amount: float
-
-from pydantic import BaseModel
 
 class TelegramLink(BaseModel):
     telegram_chat_id: str
