@@ -188,12 +188,10 @@
             cursor: default;
         }
         
-        /* Тізімнің (Select) скроллын әдемілеу */
         select.form-select {
             cursor: pointer;
         }
 
-        /* Chrome, Safari, Edge үшін скролл стилі */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -213,7 +211,6 @@
             background: var(--color-primary); 
         }
 
-        /* Егер болашақта Custom Dropdown жасасаңыз (қазіргі Select орнына), мынаны қолданасыз: */
         .dropdown-menu {
             max-height: 250px;
             overflow-y: auto;
@@ -701,7 +698,6 @@
         }
 
         @media (max-width: 768px) {
-    /* 1. HEADER КОНТЕЙНЕР */
     .header-bar {
         display: flex !important;
         flex-direction: row !important; /* Қатар тұрсын */
@@ -736,28 +732,24 @@
         display: block !important;
     }
     
-    /* "Кәсіби қаржылық бақылау" деген ұсақ жазуды жасырамыз (орын алмас үшін) */
     .header-bar small {
         display: none !important;
     }
 
-    /* 3. ПРОФИЛЬ ЖӘНЕ БАТЫРМАЛАР (Оң жақ) */
     .header-bar > div:last-child {
         display: flex !important;
         align-items: center !important;
         gap: 8px !important;
     }
 
-    /* ПРОФИЛЬДІ ҚАЙТАРУ */
     .profile-box {
-        display: flex !important; /* Жасырын класты бұзу */
+        display: flex !important; 
         padding: 0 !important;
         border: none !important;
         background: transparent !important;
         margin-right: 5px !important;
     }
     
-    /* Тек аватар қалады, аты-жөнін жасырамыз (телефонға сыймайды) */
     .profile-box .text-start {
         display: none !important; 
     }
@@ -768,7 +760,6 @@
         border: 2px solid var(--color-primary) !important;
     }
 
-    /* БАТЫРМАЛАРДЫ (Excel, Лимит) ЫҚШАМДАУ */
     .header-bar .btn {
         width: 35px !important;
         height: 35px !important;
@@ -779,10 +770,9 @@
         border-radius: 10px !important;
     }
     
-    /* Батырма ішіндегі жазуды алып тастаймыз, тек иконка қалады */
     .header-bar .btn i { margin: 0 !important; }
-    .header-bar .btn { font-size: 0 !important; } /* Текстті жасыру */
-    .header-bar .btn i { font-size: 1rem !important; } /* Иконканы қайта көрсету */
+    .header-bar .btn { font-size: 0 !important; } 
+    .header-bar .btn i { font-size: 1rem !important; } 
 }
     </style>
 </head>
@@ -828,7 +818,7 @@
             
             <div class="mt-4 text-white-50 small">
                 <span id="auth-switch-text">Аккаунтыңыз жоқ па?</span>
-                <span class="text-primary fw-bold ms-1" style="cursor: pointer; text-decoration: underline;" onclick="toggleAuthMode()">Тіркелу</span>
+                <span id="auth-switch-btn" class="text-primary fw-bold ms-1" style="cursor: pointer; text-decoration: underline;" onclick="toggleAuthMode()">Тіркелу</span>
             </div>
             
             <div id="error-msg" class="alert alert-danger mt-3 py-2 small fw-bold" style="display:none; background: rgba(239, 68, 68, 0.1); border-color: #ef4444; color: #fca5a5;"></div>
@@ -1336,34 +1326,29 @@
         // ------------------------------------------------------------------
         // 3. АУТЕНТИФИКАЦИЯ (AUTH)
         // ------------------------------------------------------------------
-        // --- АВТОРИЗАЦИЯ ЛОГИКАСЫ ---
-        
-        // --- АВТОРИЗАЦИЯ ЛОГИКАСЫ ---
 
         function toggleAuthMode() {
-            isLoginMode = !isLoginMode;
-            
-            // 1. Мәтіндерді ауыстыру
-            document.getElementById("auth-title").innerText = isLoginMode ? "Жүйеге кіру" : "Тіркелу";
-            document.getElementById("auth-btn").innerText = isLoginMode ? "Кіру" : "Тіркелу";
-            document.getElementById("auth-switch-text").innerText = isLoginMode ? "Аккаунтыңыз жоқ па? Тіркелу" : "Аккаунтыңыз бар ма? Кіру";
-            
-            // 2. Өрістерді көрсету/жасыру
-            const displayStyle = isLoginMode ? "none" : "block";
-            document.getElementById("register-fields").style.display = displayStyle;     // Аты
-            document.getElementById("confirm-pass-group").style.display = displayStyle;  // Парольді растау
-            
-            // 3. ПАРОЛЬ PLACEHOLDER ӨЗГЕРТУ (ОСЫ ЖЕРДІ ҚОСТЫМ)
-            const passInput = document.getElementById("auth-password");
-            if (isLoginMode) {
-                passInput.placeholder = "••••••"; // Кіру кезінде
-            } else {
-                passInput.placeholder = "Кемінде 6 таңба"; // Тіркелу кезінде
-            }
+    isLoginMode = !isLoginMode;
+    
+    document.getElementById("auth-title").innerText = isLoginMode ? "Жүйеге кіру" : "Тіркелу";
+    document.getElementById("auth-btn").innerText = isLoginMode ? "Кіру" : "Тіркелу";
+    
+    document.getElementById("auth-switch-text").innerText = isLoginMode ? "Аккаунтыңыз жоқ па?" : "Аккаунтыңыз бар ма?";
+    document.getElementById("auth-switch-btn").innerText = isLoginMode ? "Тіркелу" : "Кіру";
+    
+    const displayStyle = isLoginMode ? "none" : "block";
+    document.getElementById("register-fields").style.display = displayStyle;
+    document.getElementById("confirm-pass-group").style.display = displayStyle;
+    
+    const passInput = document.getElementById("auth-password");
+    if (isLoginMode) {
+        passInput.placeholder = "••••••"; 
+    } else {
+        passInput.placeholder = "Кемінде 6 таңба"; 
+    }
 
-            // Қате хабарламасын жасыру
-            document.getElementById("error-msg").style.display = "none";
-        }
+    document.getElementById("error-msg").style.display = "none";
+}
 
         async function handleAuth() {
             const email = document.getElementById("auth-email").value;
@@ -1371,7 +1356,6 @@
             const btn = document.getElementById("auth-btn");
             const errorDiv = document.getElementById("error-msg");
             
-            // ВАЛИДАЦИЯ: Тіркелу кезінде парольдерді тексеру
             if (!isLoginMode) {
                 const confirmPass = document.getElementById("reg-confirm-password").value;
                 
@@ -1380,7 +1364,7 @@
                     errorDiv.style.display = "block";
                     return; 
                 }
-                if (password.length < 4) { // Қауіпсіздік үшін 4 немесе 6 деп қоюға болады
+                if (password.length < 4) { 
                     errorDiv.innerText = "Құпия сөз тым қысқа!";
                     errorDiv.style.display = "block";
                     return;
@@ -1415,7 +1399,6 @@
                     if (res.ok) { 
                         alert("Сәтті тіркелдіңіз! Енді кіріңіз."); 
                         toggleAuthMode(); 
-                        // Өрістерді тазалау
                         document.getElementById("auth-password").value = ""; 
                         document.getElementById("reg-confirm-password").value = ""; 
                     } else { 
@@ -1478,7 +1461,6 @@
         // ------------------------------------------------------------------
         // 5. СҮЗГІЛЕУ ЖӘНЕ ВИЗУАЛИЗАЦИЯ (FILTERING & CHARTS)
         // ------------------------------------------------------------------
-// --- ДҰРЫСТАЛҒАН ФИЛЬТР (Timezone жоқ + Карточкалар істейді) ---
         function applyFilter(period) {
             document.querySelectorAll('.filter-btn, .filter-chip').forEach(b => b.classList.remove('active'));
             const btn = document.getElementById('filter-' + period) || document.getElementById('btn-filter-' + period);
@@ -1517,7 +1499,6 @@
             document.getElementById("total-expenses").innerText = exp.toLocaleString() + " ₸";
             document.getElementById("net-balance").innerText = (inc - exp).toLocaleString() + " ₸";
 
-            // ГРАФИКТЕРДІ ШАҚЫРУ
             const dData = Object.keys(catMap).map(k => ({category_name: k, total_amount: catMap[k]}));
             
             setTimeout(() => {
@@ -1629,62 +1610,90 @@
         // ------------------------------------------------------------------
         // 6. ТРАНЗАКЦИЯ ҚОСУ ЖӘНЕ ЛИМИТТЕР (ADD & BUDGET CHECK)
         // ------------------------------------------------------------------
-        let pendingBody = null;
+let pendingBody = null;
 
-        function checkBudgetLimit(catId, amountToAdd) {
-            const budget = allBudgets.find(b => b.category_id === catId);
-            if (!budget) return null;
-            
-            const currentSpent = allTransactions
-                .filter(t => t.type === 'exp' && t.category_id === catId)
-                .reduce((sum, t) => sum + t.amount, 0);
-            
-            const totalAfter = currentSpent + amountToAdd;
-            
-            if (totalAfter > budget.limit_amount) {
-                return { limit: budget.limit_amount, total: totalAfter };
-            }
-            return null;
-        }
+function checkBudgetLimit(catId, amountToAdd) {
+    console.log("Тексеріліп жатқан Санат ID:", catId);
+    console.log("Барлық бюджеттер тізімі:", allBudgets);
+
+    const budget = allBudgets.find(b => b.category_id == catId);
+
+    if (!budget) {
+        console.log("❌ Бұл санатқа лимит табылмады.");
+        return null;
+    }
+
+    const currentSpent = allTransactions
+        .filter(t => t.type === 'exp' && t.category_id == catId)
+        .reduce((sum, t) => sum + Number(t.amount), 0); 
+
+    const totalAfter = currentSpent + amountToAdd;
+
+    console.log(`📊 Есеп: Жұмсалды=${currentSpent}, Қосылатыны=${amountToAdd}, Болашақ=${totalAfter}, Лимит=${budget.limit_amount}`);
+
+    if (totalAfter > budget.limit_amount) {
+        console.warn("⚠️ ЛИМИТТЕН АСЫП КЕТТІ!");
+        return {
+            limit: budget.limit_amount,
+            total: totalAfter,
+            diff: totalAfter - budget.limit_amount
+        };
+    }
+    
+    console.log("✅ Лимиттен аспады.");
+    return null;
+}
 
         async function addTransaction() {
-            const amount = parseFloat(document.getElementById("amount").value);
-            const desc = document.getElementById("desc").value;
-            const dateVal = document.getElementById("date").value;
+    const amountVal = document.getElementById("amount").value;
+    const desc = document.getElementById("desc").value;
+    const dateVal = document.getElementById("date").value;
+    
+    const amount = parseFloat(amountVal);
+
+    if (!amount) { alert("Соманы жазыңыз!"); return; }
+    
+    const body = { amount: amount, description: desc, date: dateVal };
+
+    if (currentType === 'expense') {
+        const catId = document.getElementById("expense-cat-id").value; 
+        body.category_id = parseInt(catId); 
+        
+        const warning = checkBudgetLimit(catId, amount);
+        
+        if (warning) {
+            pendingBody = body; 
             
-            if (!amount) { alert("Соманы жазыңыз!"); return; }
+            document.getElementById("warn-limit").innerText = warning.limit.toLocaleString() + " ₸";
+            document.getElementById("warn-total").innerText = warning.total.toLocaleString() + " ₸";
             
-            const body = { amount: amount, description: desc, date: dateVal };
-
-            if (currentType === 'expense') {
-                const catId = parseInt(document.getElementById("expense-cat-id").value);
-                body.category_id = catId;    
-                
-                const warning = checkBudgetLimit(catId, amount);
-                if (warning) {
-                    pendingBody = body; 
-                    document.getElementById("warn-limit").innerText = warning.limit.toLocaleString();
-                    document.getElementById("warn-total").innerText = warning.total.toLocaleString();
-                    new bootstrap.Modal(document.getElementById('warningModal')).show(); 
-                    return;
-                }
-            } 
-
-            else { 
-                const catId = parseInt(document.getElementById("income-cat-id").value);
-                body.category_id = catId; 
-            }
-
-            await sendTransaction(body);
+            const modalEl = document.getElementById('warningModal');
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+            
+            return; 
         }
+    } 
+    else { 
+        const catId = document.getElementById("income-cat-id").value;
+        body.category_id = parseInt(catId); 
+    }
+
+
+    await sendTransaction(body);
+}
 
         async function confirmAddTransaction() {
-            if (pendingBody) {
-                await sendTransaction(pendingBody);
-                bootstrap.Modal.getInstance(document.getElementById('warningModal')).hide();
-                pendingBody = null;
-            }
-        }
+    if (pendingBody) {
+        await sendTransaction(pendingBody);
+        
+        const modalEl = document.getElementById('warningModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+        
+        pendingBody = null;
+    }
+}
 
         async function sendTransaction(body) {
             try {
@@ -1916,131 +1925,126 @@ function openExcelModal() {
         }
 
         async function loadBudgets() {
-            try {
+    try {
+        const [resBudgets, resStats] = await Promise.all([
+            fetch(`${API_URL}/budgets/`, { headers: { "Authorization": `Bearer ${token}` } }),
+            fetch(`${API_URL}/statistics/expenses/`, { headers: { "Authorization": `Bearer ${token}` } })
+        ]);
 
-                const [resBudgets, resStats] = await Promise.all([
-                    fetch(`${API_URL}/budgets/`, { headers: { "Authorization": `Bearer ${token}` } }),
-                    fetch(`${API_URL}/statistics/expenses/`, { headers: { "Authorization": `Bearer ${token}` } })
-                ]);
-                
-                const budgets = await resBudgets.json();
-                const stats = await resStats.json();
-                
-                const expenseMap = {};
-                stats.forEach(s => expenseMap[s.category_name] = s.total_amount);
+        allBudgets = await resBudgets.json(); 
+        
+        const stats = await resStats.json();
+        
+        const expenseMap = {};
+        stats.forEach(s => expenseMap[s.category_name] = s.total_amount);
 
-                const list = document.getElementById("budget-list");
-                list.innerHTML = "";
+        const list = document.getElementById("budget-list");
+        list.innerHTML = "";
 
-                if(budgets.length === 0) {
-                    list.innerHTML = '<div class="text-center text-secondary py-5"><i class="fas fa-wallet fa-3x mb-3 opacity-25"></i><p>Лимиттер әлі қойылмаған</p></div>';
-                    return;
-                }
-
-
-                const icons = {
-                    1: "fa-utensils", 2: "fa-car", 3: "fa-shopping-bag", 4: "fa-gamepad",
-                    5: "fa-home", 6: "fa-medkit", 7: "fa-graduation-cap", 8: "fa-plane", 9: "fa-box"
-                };
-
-                budgets.forEach(b => {
-                    const catName = catNames[b.category_id] || "Белгісіз";
-                    const spent = expenseMap[catName] || 0;
-                    const limit = b.limit_amount;
-                    const remaining = limit - spent;
-                    
-                    let percent = (spent / limit) * 100;
-                    if (percent > 100) percent = 100;
-
-
-                    let progressColor = "#10b981";
-                    let remainingColor = "text-success";
-                    let statusIcon = "fa-check-circle"; 
-                    let statusColor = "text-success";
-
-                    if (percent > 70) { progressColor = "#f59e0b"; remainingColor = "text-warning"; } // Сары
-                    if (percent >= 100) { 
-                        progressColor = "#ef4444"; 
-                        remainingColor = "text-danger"; 
-                        statusIcon = "fa-exclamation-circle"; 
-                        statusColor = "text-danger";
-                    }
-
-                    list.innerHTML += `
-                        <div class="p-3 mb-3 rounded-4 border" style="background: #1e293b; border-color: #334155 !important;">
-                            
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="d-flex gap-3 align-items-center">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center text-white" 
-                                         style="width: 45px; height: 45px; background: rgba(255,255,255,0.05); font-size: 1.2rem;">
-                                        <i class="fas ${icons[b.category_id] || 'fa-tag'}"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="fw-bold mb-1 text-white">${catName}</h6>
-                                        <small class="text-secondary" style="font-size: 0.75rem;">
-                                            Аяқталады: ${b.end_date.split('T')[0]}
-                                        </small>
-                                    </div>
-                                </div>
-                                <i class="fas ${statusIcon} ${statusColor} fs-4"></i>
-                            </div>
-
-                            <div class="d-flex justify-content-between text-white-50 small mb-2">
-                                <span>Жұмсалды: <b class="text-white">${spent.toLocaleString()} ₸</b></span>
-                                <span>Лимит: ${limit.toLocaleString()} ₸</span>
-                            </div>
-
-                            <div class="progress mb-2" style="height: 6px; background: #334155;">
-                                <div class="progress-bar" role="progressbar" 
-                                     style="width: ${percent}%; background-color: ${progressColor}; border-radius: 10px;">
-                                </div>
-                            </div>
-
-                            <div class="d-flex justify-content-between small">
-                                <span class="text-secondary">${Math.round(percent)}% қолданылды</span>
-                                <span class="${remainingColor} fw-bold">
-                                    ${remaining < 0 ? 'Асып кетті: ' : 'Қалды: '} 
-                                    ${Math.abs(remaining).toLocaleString()} ₸
-                                </span>
-                            </div>
-                        </div>`;
-                });
-
-            } catch (e) {
-                console.error(e);
-                alert("Бюджетті жүктеу кезінде қате шықты!");
-            }
+        if(allBudgets.length === 0) { 
+            list.innerHTML = '<div class="text-center text-secondary py-5"><i class="fas fa-wallet fa-3x mb-3 opacity-25"></i><p>Лимиттер әлі қойылмаған</p></div>';
+            return;
         }
-        // --- ДИАГРАММА СЫЗАТЫН ФУНКЦИЯЛАР (МЫНАУ ЖЕТІСПЕЙ ТҰР) ---
 
-    // Глобалды айнымалылар (ескі графиктерді өшіру үшін керек)
+        const icons = {
+            1: "fa-utensils", 2: "fa-car", 3: "fa-shopping-bag", 4: "fa-gamepad",
+            5: "fa-home", 6: "fa-medkit", 7: "fa-graduation-cap", 8: "fa-plane", 9: "fa-box"
+        };
+
+        allBudgets.forEach(b => {
+            const catName = catNames[b.category_id] || "Белгісіз";
+            const spent = expenseMap[catName] || 0;
+            const limit = b.limit_amount;
+            const remaining = limit - spent;
+            
+            let percent = (spent / limit) * 100;
+            if (percent > 100) percent = 100;
+
+            let progressColor = "#10b981";
+            let remainingColor = "text-success";
+            let statusIcon = "fa-check-circle"; 
+            let statusColor = "text-success";
+
+            if (percent > 70) { progressColor = "#f59e0b"; remainingColor = "text-warning"; }
+            if (percent >= 100) { 
+                progressColor = "#ef4444"; 
+                remainingColor = "text-danger"; 
+                statusIcon = "fa-exclamation-circle"; 
+                statusColor = "text-danger";
+            }
+
+            list.innerHTML += `
+                <div class="p-3 mb-3 rounded-4 border" style="background: #1e293b; border-color: #334155 !important;">
+                    
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="d-flex gap-3 align-items-center">
+                            <div class="rounded-3 d-flex align-items-center justify-content-center text-white" 
+                                 style="width: 45px; height: 45px; background: rgba(255,255,255,0.05); font-size: 1.2rem;">
+                                <i class="fas ${icons[b.category_id] || 'fa-tag'}"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1 text-white">${catName}</h6>
+                                <small class="text-secondary" style="font-size: 0.75rem;">
+                                    Аяқталады: ${b.end_date.split('T')[0]}
+                                </small>
+                            </div>
+                        </div>
+                        <i class="fas ${statusIcon} ${statusColor} fs-4"></i>
+                    </div>
+
+                    <div class="d-flex justify-content-between text-white-50 small mb-2">
+                        <span>Жұмсалды: <b class="text-white">${spent.toLocaleString()} ₸</b></span>
+                        <span>Лимит: ${limit.toLocaleString()} ₸</span>
+                    </div>
+
+                    <div class="progress mb-2" style="height: 6px; background: #334155;">
+                        <div class="progress-bar" role="progressbar" 
+                             style="width: ${percent}%; background-color: ${progressColor}; border-radius: 10px;">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between small">
+                        <span class="text-secondary">${Math.round(percent)}% қолданылды</span>
+                        <span class="${remainingColor} fw-bold">
+                            ${remaining < 0 ? 'Асып кетті: ' : 'Қалды: '} 
+                            ${Math.abs(remaining).toLocaleString()} ₸
+                        </span>
+                    </div>
+                </div>`;
+        });
+
+    } catch (e) {
+        console.error(e);
+        alert("Бюджетті жүктеу кезінде қате шықты!");
+    }
+}
+        
+
     let myChartInstance = null;
     let doughnutInstance = null;
 
-    // 1. Дөңгелек график (Doughnut Chart)
-   // --- 1. ФИЛЬТР ФУНКЦИЯСЫ (ТҮЗЕТІЛГЕН НҰСҚА) ---
+    
     function applyFilter(period) {
-        // 1. БАТЫРМАНЫҢ ТҮСІН ӨЗГЕРТУ (ОСЫ ЖЕРДІ ЖӨНДЕДІМ)
-        // Барлық батырмалардан 'active' алып тастаймыз
+        
         const buttons = document.querySelectorAll('.filter-chip, .filter-btn');
         buttons.forEach(btn => btn.classList.remove('active'));
 
-        // Басылған батырманы іздейміз (Екі вариантпен)
+        
         let btn = document.getElementById('filter-' + period);
         if (!btn) {
             btn = document.getElementById('btn-filter-' + period);
         }
         
-        // Табылса, түсін қосамыз
+        
         if (btn) {
             btn.classList.add('active');
         }
 
-        // 2. УАҚЫТТЫ АЛУ
+        
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // 3. ДЕРЕКТЕРДІ СҮЗУ
+        
         let filtered = allTransactions.filter(item => {
             const dParts = item.date.split('T')[0].split('-');
             const txDate = new Date(dParts[0], dParts[1] - 1, dParts[2]); 
@@ -2055,10 +2059,10 @@ function openExcelModal() {
             return true;
         });
 
-        // 4. ТІЗІМДІ ЖАҢАРТУ
+        
         renderListOnly(filtered);
 
-        // 5. ДЕРЕКТЕРДІ ЖИНАУ
+        
         let totalInc = 0, totalExp = 0;
         const catMap = {}; 
         const dateMap = {}; 
@@ -2078,7 +2082,7 @@ function openExcelModal() {
             else dateMap[dKey].exp += i.amount;
         });
 
-        // 6. САНДАРДЫ ЖАҢАРТУ (ID-лерді тексеріп аламыз)
+        
         const elInc = document.getElementById("total-inc") || document.getElementById("total-income");
         const elExp = document.getElementById("total-exp") || document.getElementById("total-expenses");
         const elBal = document.getElementById("net-bal") || document.getElementById("net-balance");
@@ -2087,7 +2091,7 @@ function openExcelModal() {
         if(elExp) elExp.innerText = totalExp.toLocaleString() + " ₸";
         if(elBal) elBal.innerText = (totalInc - totalExp).toLocaleString() + " ₸";
 
-        // 7. ГРАФИКТЕРДІ СЫЗУ
+        
         const sortedDates = Object.keys(dateMap).sort();
         const dataInc = sortedDates.map(d => dateMap[d].inc);
         const dataExp = sortedDates.map(d => dateMap[d].exp);
@@ -2102,15 +2106,14 @@ function openExcelModal() {
     // --- 2. ГРАФИК СЫЗУ ФУНКЦИЯЛАРЫ ---
         
 
-    // A) Бағанды график (Күндері бар)
-    // A) Бағанды график (СІЗ ҚАЛАҒАНДАЙ: МАКСИМУМДЫ ЖАЛПЫ СОМАҒА ТЕҢЕСТІРУ)
+
     function drawTrendChart(labels, dataInc, dataExp) {
         const ctx = document.getElementById('barChart');
         if (!ctx) return;
 
         if (myChartInstance) myChartInstance.destroy();
 
-        // Ең үлкен жалпы соманы табамыз (Кіріс немесе Шығыс)
+       
         const maxTotal = Math.max(
             dataInc.reduce((a, b) => a + b, 0), 
             dataExp.reduce((a, b) => a + b, 0)
@@ -2135,8 +2138,6 @@ function openExcelModal() {
                         beginAtZero: true, 
                         grid: { color: '#374151' }, 
                         ticks: { color: '#ffffff' },
-                        // МЫНА ЖЕРДІ ӨЗГЕРТТІМ:
-                        // Енді график шкаласы жалпы сомаға дейін созылады
                         suggestedMax: maxTotal 
                     }
                 }
@@ -2144,7 +2145,7 @@ function openExcelModal() {
         });
     }
 
-    // B) Дөңгелек график
+
     function drawDoughnut(data) {
         const ctx = document.getElementById('doughnutChart');
         if (!ctx) return;
@@ -2153,7 +2154,7 @@ function openExcelModal() {
 
         let labels = [], values = [], colors = ['#334155'];
         
-        // Деректерді дұрыс оқу
+        
         if (Array.isArray(data) && data.length > 0) {
             labels = data.map(d => d.category_name);
             values = data.map(d => d.total_amount);
@@ -2179,24 +2180,23 @@ function openExcelModal() {
             }
         });
     }
-    // 1. Модальды ашу функциясы
+    
 function openProfileModal() {
-    // Аты мен почтаны header-ден алып, модальға қоямыз
+    
     const nameText = document.getElementById("header-user-name")?.innerText || "User";
     const emailText = document.getElementById("header-user-email")?.innerText || "...";
     
     document.getElementById("profile-name").innerText = nameText;
     document.getElementById("profile-email").innerText = emailText;
     
-    // Транзакция санын санап қою (әдемілік үшін)
+    
     document.getElementById("profile-tx-count").innerText = allTransactions.length;
 
-    // Терезені ашу
+    
     new bootstrap.Modal(document.getElementById('profileModal')).show();
 }
 
-// 2. showApp() функциясының ішіндегі user-name ID-ларын дұрыстау
-// (Себебі мен HTML-де ID-ларды "header-user-name" деп өзгерттім, шатаспау үшін)
+
 function showApp() {
     document.getElementById('auth-screen').style.display='none';
     document.getElementById('app-screen').style.display='block';
@@ -2206,7 +2206,7 @@ function showApp() {
     fetch(`${API_URL}/users/me/`, { headers: {"Authorization": `Bearer ${token}`} })
         .then(r => r.json())
         .then(u => {
-            // Header-дегі жазуларды жаңарту
+            
             if(document.getElementById("header-user-name")) 
                 document.getElementById("header-user-name").innerText = u.username;
             if(document.getElementById("header-user-email")) 
@@ -2216,39 +2216,38 @@ function showApp() {
 // --- ПРОФИЛЬДІ ӨЗГЕРТУ ЛОГИКАСЫ ---
     let isEditing = false;
 
-    // 1. Өңдеу режимін қосу/өшіру (Қаламды басқанда)
+    
     function toggleEditMode() {
         isEditing = !isEditing;
         
         if (isEditing) {
-            // Форманы көрсетеміз, жай жазуды жасырамыз
+            
             document.getElementById('view-mode').style.display = 'none';
             document.getElementById('edit-mode').style.display = 'block';
             
-            // Қазіргі атын input-қа жазып қоямыз
+            
             document.getElementById('edit-username').value = document.getElementById('profile-name').innerText;
             document.getElementById('edit-email').value = document.getElementById('profile-email').innerText;
         } else {
-            // Керісінше
+            
             document.getElementById('view-mode').style.display = 'block';
             document.getElementById('edit-mode').style.display = 'none';
         }
     }
 
-    // 2. Өзгерістерді сақтау (Simulation)
+    
     function saveProfileChanges() {
         const newName = document.getElementById('edit-username').value;
         const newEmail = document.getElementById('edit-email').value;
 
         if(!newName || !newEmail) return alert("Өрістерді толтырыңыз!");
 
-        // Бұл жерде серверге сұраныс кету керек. 
-        // Әзірге тек экранда өзгертеміз:
+        
         
         document.getElementById('profile-name').innerText = newName;
         document.getElementById('profile-email').innerText = newEmail;
         
-        // Header-дегі (жоғарғы сол жақ) атын да өзгертеміз
+        
         if(document.getElementById('header-user-name')) {
             document.getElementById('header-user-name').innerText = newName;
         }
@@ -2257,26 +2256,57 @@ function showApp() {
         }
 
         alert("Профиль сәтті жаңартылды!");
-        toggleEditMode(); // Режимді жабу
+        toggleEditMode(); 
     }
     
+function copyTelegramId() {
+    const tempElement = document.createElement('textarea');
+    
+    
+    const bot_username = '@MeningQarjyBot';
+    
+    
+    const instruction = "1. Telegram-нан " + bot_username + " ботын тап.\n2. Ботқа 'Сәлем' немесе /start деп жаз.\n3. Маған ID нөміріңді жібер.";
+
+    alert("Келесі қадамдарды орындаңыз:\n\n" + instruction);
+
+    
+}
+
+    // --- ПРОФИЛЬДІ АШАТЫН ФУНКЦИЯ (ЕҢ АСТЫНДА ТҰРУ КЕРЕК) ---
+function openProfileModal() {
+    console.log("Профиль ашылуда..."); 
+
+    const nameText = document.getElementById("header-user-name")?.innerText || "Қонақ";
+    const emailText = document.getElementById("header-user-email")?.innerText || "email@joq.kz";
+    
+    const modalName = document.getElementById("profile-name");
+    const modalEmail = document.getElementById("profile-email");
+    const modalCount = document.getElementById("profile-tx-count");
+
+    if(modalName) modalName.innerText = nameText;
+    if(modalEmail) modalEmail.innerText = emailText;
+    
+    if(modalCount && typeof allTransactions !== 'undefined') {
+        modalCount.innerText = allTransactions.length;
+    }
+    const myModal = new bootstrap.Modal(document.getElementById('profileModal'));
+    myModal.show();
+}
 // --- ПРОФИЛЬ ФУНКЦИЯЛАРЫ ---
 
-// 1. Аккаунтты өшіру функциясы (Симуляция)
 function deleteAccount() {
     if(confirm("Сіз шынымен аккаунтыңызды және барлық деректерді өшіргіңіз келе ме? Бұл әрекетті қайтару мүмкін емес!")) {
         alert("Аккаунт өшірілуде...");
-        // Бұл жерде серверге DELETE сұранысы кетуі керек еді
-        // fetch('/users/me', { method: 'DELETE' ... })
         
         setTimeout(() => {
             alert("Аккаунт сәтті өшірілді.");
-            logout(); // Шығарып жібереміз
+            logout(); 
         }, 1000);
     }
 }
 
-// 2. Өңдеу режимі (Алдыңғы код қалды)
+
 function toggleEditMode() {
     isEditing = !isEditing;
     if (isEditing) {
@@ -2298,7 +2328,7 @@ function saveProfileChanges() {
     document.getElementById('profile-name').innerText = newName;
     document.getElementById('profile-email').innerText = newEmail;
     
-    // Header-ді де жаңарту
+    
     if(document.getElementById('header-user-name')) document.getElementById('header-user-name').innerText = newName;
     
     alert("Сақталды!");
@@ -2310,7 +2340,7 @@ function saveProfileChanges() {
 function toggleEditMode() {
     isEditing = !isEditing;
     if (isEditing) {
-        // Форманы ашу және мәндерді толтыру
+        
         document.getElementById('view-mode').style.display = 'none';
         document.getElementById('edit-mode').style.display = 'block';
         document.getElementById('edit-username').value = document.getElementById('profile-name').innerText;
@@ -2328,7 +2358,7 @@ async function saveProfileChanges() {
     if(!newName || !newEmail) return showToast("Өрістерді толтырыңыз!", "error");
 
     try {
-        // Серверге жіберу (PUT /users/me)
+        
         const res = await fetch(`${API_URL}/users/me`, { 
             method: 'PUT',
             headers: { 
@@ -2342,16 +2372,16 @@ async function saveProfileChanges() {
         });
 
         if (res.ok) {
-            // Интерфейсті жаңарту
+            
             document.getElementById('profile-name').innerText = newName;
             document.getElementById('profile-email').innerText = newEmail;
             
-            // Header-дегі жазуды да өзгерту
+            
             if(document.getElementById('header-user-name')) document.getElementById('header-user-name').innerText = newName;
             if(document.getElementById('header-user-email')) document.getElementById('header-user-email').innerText = newEmail;
 
             showToast("Профиль сәтті жаңартылды!");
-            toggleEditMode(); // Режимді жабу
+            toggleEditMode(); 
         } else {
             const err = await res.json();
             showToast(err.detail || "Қате шықты!", "error");
@@ -2423,25 +2453,22 @@ async function saveNewPassword() {
 
 // --- 4. АККАУНТТЫ ӨШІРУ (ШЫНАЙЫ) ---
 async function deleteAccount() {
-    // 1. Ескерту (Қорғаныс)
     if(!confirm("СІЗ ШЫНЫМЕН АККАУНТЫҢЫЗДЫ ӨШІРГІҢІЗ КЕЛЕ МЕ?\n\nБұл әрекетті кері қайтару мүмкін емес! Барлық транзакциялар жойылады.")) {
-        return; // "Жоқ" десе, тоқтатамыз
+        return; 
     }
 
-    // 2. Серверге сұраныс жіберу
+
     try {
         const res = await fetch(`${API_URL}/users/me`, { 
-            method: 'DELETE', // Өшіру командасы
+            method: 'DELETE', 
             headers: { 
                 "Authorization": `Bearer ${token}`
             }
         });
 
         if (res.ok) {
-            // Сәтті өшсе
             showToast("Аккаунт толығымен өшірілді!", "success");
             
-            // 2 секундтан соң шығарып жібереміз
             setTimeout(() => {
                 logout(); 
             }, 2000);
@@ -2460,10 +2487,8 @@ function showToast(message, type = "success") {
     const toastEl = document.getElementById('liveToast');
     const toastBody = document.getElementById('toast-message');
     
-    // Хабарлама мәтінін қою
     toastBody.innerText = message;
     
-    // Түсін өзгерту (Жасыл - сәтті, Қызыл - қате)
     if (type === "error") {
         toastEl.classList.remove('bg-success');
         toastEl.classList.add('bg-danger');
@@ -2472,7 +2497,6 @@ function showToast(message, type = "success") {
         toastEl.classList.add('bg-success');
     }
 
-    // Bootstrap арқылы көрсету
     const toast = new bootstrap.Toast(toastEl);
     toast.show();
 }
